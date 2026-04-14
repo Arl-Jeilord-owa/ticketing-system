@@ -1,0 +1,101 @@
+/* variables.css — design tokens */
+:root {
+  /* Brand colors */
+  --color-blue-50:    #E6F1FB;
+  --color-blue-200:   #85B7EB;
+  --color-blue-400:   #378ADD;
+  --color-blue-600:   #185FA5;
+  --color-blue-800:   #0C447C;
+  --color-blue-900:   #042C53;
+
+  --color-purple-50:  #EEEDFE;
+  --color-purple-400: #7F77DD;
+  --color-purple-600: #534AB7;
+  --color-purple-800: #3C3489;
+  --color-purple-900: #26215C;
+
+  --color-teal-50:    #E1F5EE;
+  --color-teal-400:   #1D9E75;
+  --color-teal-600:   #0F6E56;
+  --color-teal-800:   #085041;
+
+  --color-green-50:   #EAF3DE;
+  --color-green-400:  #639922;
+  --color-green-600:  #3B6D11;
+  --color-green-800:  #27500A;
+
+  --color-amber-50:   #FAEEDA;
+  --color-amber-400:  #BA7517;
+  --color-amber-600:  #854F0B;
+  --color-amber-800:  #633806;
+
+  --color-red-50:     #FCEBEB;
+  --color-red-100:    #F7C1C1;
+  --color-red-400:    #E24B4A;
+  --color-red-600:    #A32D2D;
+  --color-red-800:    #791F1F;
+  --color-red-900:    #501313;
+
+  --color-gray-50:    #F1EFE8;
+  --color-gray-100:   #D3D1C7;
+  --color-gray-400:   #888780;
+  --color-gray-600:   #5F5E5A;
+  --color-gray-800:   #444441;
+
+  /* Semantic UI */
+  --bg-primary:       #ffffff;
+  --bg-secondary:     #f5f5f3;
+  --bg-tertiary:      #ededea;
+
+  --text-primary:     #1a1a18;
+  --text-secondary:   #5a5a57;
+  --text-tertiary:    #999990;
+
+  --border-default:   rgba(0,0,0,.10);
+  --border-medium:    rgba(0,0,0,.18);
+  --border-strong:    rgba(0,0,0,.28);
+
+  /* Spacing */
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.06);
+
+  /* Sidebar */
+  --sidebar-width: 220px;
+
+  /* Panel */
+  --panel-width: 480px;
+
+  /* Z-index layers */
+  --z-panel:   100;
+  --z-modal:   200;
+  --z-toast:   300;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary:     #1c1c1a;
+    --bg-secondary:   #252523;
+    --bg-tertiary:    #2e2e2b;
+
+    --text-primary:   #f0efe8;
+    --text-secondary: #b0b0a8;
+    --text-tertiary:  #737370;
+
+    --border-default: rgba(255,255,255,.08);
+    --border-medium:  rgba(255,255,255,.14);
+    --border-strong:  rgba(255,255,255,.22);
+  }
+}

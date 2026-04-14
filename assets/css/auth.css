@@ -1,0 +1,381 @@
+/* auth.css — authentication gate screens */
+
+/* ── Gate wrapper ── */
+#auth-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(55,138,221,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(127,119,221,.06) 0%, transparent 60%);
+  padding: 24px;
+}
+
+/* ── Screen switching ── */
+.auth-screen {
+  display: none;
+  width: 100%;
+  max-width: 480px;
+  animation: authFadeIn .22s ease;
+}
+.auth-screen.active {
+  display: block;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Card ── */
+.auth-card {
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: 36px 40px 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Logo row ── */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.auth-logo-mark {
+  width: 36px;
+  height: 36px;
+  color: var(--color-blue-400);
+  flex-shrink: 0;
+}
+.auth-logo-mark svg { width: 36px; height: 36px; }
+.auth-logo-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.auth-logo-tagline {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* ── Headings ── */
+.auth-step-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-blue-400);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.auth-heading {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.auth-subheading {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.auth-subheading strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Back button ── */
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  transition: color .15s;
+}
+.auth-back:hover { color: var(--text-primary); }
+
+/* ── Role selector grid ── */
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 16px;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+.role-card:hover {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+  transform: translateY(-1px);
+}
+.role-card:active { transform: translateY(0); }
+
+.role-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blue-400);
+}
+.role-icon svg { width: 18px; height: 18px; }
+
+.role-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.role-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.role-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-teal-50);
+  color: var(--color-teal-800);
+  margin-top: 2px;
+}
+.role-pill.employee {
+  background: var(--color-purple-50);
+  color: var(--color-purple-800);
+}
+
+/* ── Phone input ── */
+.phone-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.phone-country-select {
+  width: 110px;
+  flex-shrink: 0;
+  padding: 10px 10px;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+.phone-country-select:focus {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.12);
+}
+
+.phone-number-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: var(--font-mono, monospace);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  letter-spacing: 0.05em;
+  transition: border-color .15s, box-shadow .15s;
+}
+.phone-number-input:focus {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.12);
+}
+.phone-number-input::placeholder { color: var(--text-tertiary); }
+
+/* ── Field hint ── */
+.field-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* ── OTP digits ── */
+.otp-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.otp-digit {
+  width: 52px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  caret-color: var(--color-blue-400);
+}
+.otp-digit:focus {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.14);
+  z-index: 1;
+}
+.otp-digit.filled { border-color: var(--color-blue-400); }
+
+/* ── OTP resend row ── */
+.otp-resend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.otp-timer-label { color: var(--text-secondary); }
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-blue-400);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+}
+.btn-link:hover { text-decoration: underline; }
+
+/* ── Cooldown banner ── */
+.cooldown-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-amber-50);
+  color: var(--color-amber-600);
+  border: 0.5px solid rgba(186,117,23,.25);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* ── Auth error ── */
+.auth-error {
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+  border: 0.5px solid rgba(226,75,74,.2);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ── Dev demo banner ── */
+.dev-banner {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 0.5px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  gap: 6px;
+}
+.dev-banner strong { color: var(--text-primary); font-weight: 600; }
+
+/* ── Auth primary button ── */
+.btn-auth {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-blue-400);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background .15s, transform .1s, opacity .15s;
+}
+.btn-auth:hover { background: var(--color-blue-600); }
+.btn-auth:active { transform: scale(0.98); }
+.btn-auth:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── Employee form ── */
+.field-stack { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.auth-input {
+  padding: 10px 12px;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.auth-input:focus {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.12);
+}
+.auth-input::placeholder { color: var(--text-tertiary); }
+
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-wrap .auth-input { width: 100%; padding-right: 40px; }
+
+.btn-toggle-pw {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+.btn-toggle-pw:hover { color: var(--text-secondary); }

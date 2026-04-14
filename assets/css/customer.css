@@ -1,0 +1,216 @@
+/* customer.css — customer submit portal styles */
+
+/* ── Top bar ── */
+.customer-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--bg-primary);
+  border-bottom: 0.5px solid var(--border-default);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.customer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+.customer-logo svg { color: var(--color-blue-400); }
+
+.customer-user-info {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.btn-signout-sm {
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  border: 0.5px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-signout-sm:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* ── Content area ── */
+.customer-content {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+}
+
+/* ── Cooldown state ── */
+.customer-cooldown-card {
+  background: var(--color-amber-50);
+  border: 0.5px solid rgba(186,117,23,.2);
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  text-align: center;
+}
+.cooldown-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(186,117,23,.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--color-amber-600);
+}
+.cooldown-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-amber-800);
+  margin-bottom: 8px;
+}
+.cooldown-desc {
+  font-size: 14px;
+  color: var(--color-amber-600);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.cooldown-timer-display {
+  font-size: 32px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+  color: var(--color-amber-800);
+  letter-spacing: 0.04em;
+}
+
+/* ── Submit form ── */
+.customer-form-card {
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.customer-form-header {
+  padding: 22px 26px 18px;
+  border-bottom: 0.5px solid var(--border-default);
+}
+
+.customer-form-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.customer-form-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.customer-form-body {
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.c-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.c-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.c-field input,
+.c-field select,
+.c-field textarea {
+  padding: 10px 12px;
+  border: 0.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.c-field input:focus,
+.c-field select:focus,
+.c-field textarea:focus {
+  border-color: var(--color-blue-400);
+  box-shadow: 0 0 0 3px rgba(55,138,221,.1);
+}
+.c-field input::placeholder,
+.c-field textarea::placeholder { color: var(--text-tertiary); }
+.c-field textarea { min-height: 110px; resize: vertical; }
+
+.c-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.customer-form-footer {
+  padding: 16px 26px 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Success state ── */
+.customer-success-card {
+  background: var(--color-green-50);
+  border: 0.5px solid rgba(99,153,34,.2);
+  border-radius: var(--radius-xl);
+  padding: 36px 28px;
+  text-align: center;
+}
+.success-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(99,153,34,.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--color-green-600);
+}
+.success-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-green-800);
+  margin-bottom: 8px;
+}
+.success-desc {
+  font-size: 14px;
+  color: var(--color-green-600);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.success-ticket-id {
+  display: inline-block;
+  font-size: 13px;
+  font-family: var(--font-mono, monospace);
+  background: rgba(99,153,34,.12);
+  color: var(--color-green-800);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-top: 6px;
+}
+.success-note {
+  font-size: 12px;
+  color: var(--color-green-600);
+  margin-top: 16px;
+  line-height: 1.5;
+}

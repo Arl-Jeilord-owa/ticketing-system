@@ -1,0 +1,114 @@
+/* sidebar.css */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: 0.5px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+/* Logo */
+.logo {
+  padding: 0 16px 16px;
+  border-bottom: 0.5px solid var(--border-default);
+  margin-bottom: 8px;
+}
+.logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+/* Section headings */
+.nav-section {
+  padding: 10px 16px 4px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Nav items */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-left: 2px solid transparent;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  user-select: none;
+}
+.nav-item:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+.nav-item.active {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-left-color: var(--color-blue-400);
+  font-weight: 500;
+}
+
+/* Nav icons */
+.nav-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Nav colored dots */
+.nav-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-gray   { background: var(--color-gray-400); }
+.dot-purple { background: var(--color-purple-400); }
+.dot-teal   { background: var(--color-teal-400); }
+.dot-green  { background: var(--color-green-400); }
+
+/* ── Sidebar footer ── */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 0.5px solid var(--border-default);
+}
+.session-info {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-signout {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  border: 0.5px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s;
+}
+.btn-signout:hover {
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+  border-color: rgba(226,75,74,.2);
+}
