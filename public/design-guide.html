@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OMTPI HelpDesk — UI Design Guide</title>
+  <script src="js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/badges.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      padding: 0 0 80px;
+    }
+    /* Guide layout */
+    .guide-topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg-primary);
+      border-bottom: 0.5px solid var(--border-default);
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 32px;
+    }
+    .guide-title {
+      font-size: 15px; font-weight: 600; flex: 1; letter-spacing: -0.01em;
+    }
+    .guide-body {
+      max-width: 900px; margin: 0 auto; padding: 40px 32px;
+      display: flex; flex-direction: column; gap: 48px;
+    }
+    /* Section */
+    .section {}
+    .section-header {
+      display: flex; align-items: baseline; gap: 12px;
+      border-bottom: 0.5px solid var(--border-default);
+      padding-bottom: 10px; margin-bottom: 24px;
+    }
+    .section-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+    .section-file  { font-size: 12px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; }
+    /* Subsection */
+    .sub-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    /* Row */
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 20px; }
+    /* Color swatch */
+    .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px,1fr)); gap: 8px; }
+    .swatch { border-radius: 8px; overflow: hidden; border: 0.5px solid var(--border-default); }
+    .swatch-color { height: 48px; }
+    .swatch-info  { padding: 6px 8px; font-size: 11px; color: var(--text-secondary); background: var(--bg-primary); font-family: 'DM Mono', monospace; }
+    .swatch-name  { font-weight: 500; color: var(--text-primary); margin-bottom: 1px; }
+    /* Preview card */
+    .preview-card {
+      background: var(--bg-primary); border: 0.5px solid var(--border-default);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 8px;
+    }
+    /* Code snippet */
+    pre {
+      background: var(--bg-secondary); border: 0.5px solid var(--border-default);
+      border-radius: 8px; padding: 14px 16px; font-size: 12px; overflow-x: auto;
+      font-family: 'DM Mono', monospace; color: var(--text-secondary); margin-top: 8px;
+    }
+    /* Typography specimens */
+    .type-specimen { padding: 8px 0; border-bottom: 0.5px solid var(--border-default); }
+    .type-meta { font-size: 11px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+    /* Spacing ruler */
+    .spacing-row { display: flex; gap: 0; align-items: flex-end; }
+    .spacing-block { background: var(--color-blue-200); border-radius: 3px; }
+    .spacing-label { font-size: 10px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; text-align: center; margin-top: 4px; }
+    /* File map */
+    .file-map { font-family: 'DM Mono', monospace; font-size: 12px; line-height: 2; color: var(--text-secondary); }
+    .file-map .dir  { color: var(--text-primary); font-weight: 500; }
+    .file-map .file { color: var(--text-secondary); }
+    .file-map .file.new { color: var(--color-blue-400); }
+    .file-map .file.edit { color: var(--color-amber-400); }
+    .file-map .comment { color: var(--text-tertiary); }
+    /* Legend */
+    .legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+<div class="guide-topbar">
+  <div class="guide-title">OMTPI HelpDesk — UI Design Guide</div>
+  <span style="font-size:12px;color:var(--text-tertiary);">Open alongside index.html for reference</span>
+  <button class="theme-toggle" id="theme-toggle" title="Toggle dark/light mode">
+    <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4.22 1.78a1 1 0 011.42 1.42l-.7.7a1 1 0 01-1.42-1.42l.7-.7zM18 9a1 1 0 010 2h-1a1 1 0 010-2h1zM4.22 15.78a1 1 0 001.42-1.42l-.7-.7a1 1 0 00-1.42 1.42l.7.7zM2 11a1 1 0 010-2h1a1 1 0 010 2H2zm13.07 2.07a1 1 0 001.42-1.42l-.7-.7a1 1 0 00-1.42 1.42l.7.7zM15.78 4.22a1 1 0 00-1.42 1.42l.7.7a1 1 0 001.42-1.42l-.7-.7zM4.93 5.64a1 1 0 00-1.42 1.42l.7.7A1 1 0 005.63 6.34l-.7-.7zM10 6a4 4 0 100 8 4 4 0 000-8z"/></svg>
+    <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+  </button>
+</div>
+
+<div class="guide-body">
+
+  <!-- ── 1. File Map ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">1. File map — where everything lives</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#378ADD;"></div><span>New file (this update)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#BA7517;"></div><span>Modified file</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#888780;"></div><span>Unchanged</span></div>
+    </div>
+    <div class="file-map">
+<span class="dir">helpdesk/</span>
+├── <span class="file new">server.js</span>           <span class="comment">← Express entry point</span>
+├── <span class="file new">db.js</span>               <span class="comment">← MySQL connection pool</span>
+├── <span class="file new">mailer.js</span>           <span class="comment">← Nodemailer / cPanel SMTP</span>
+├── <span class="file new">.env.example</span>        <span class="comment">← Copy to .env, fill in secrets</span>
+├── <span class="file new">.gitignore</span>
+├── <span class="dir">routes/</span>
+│   ├── <span class="file new">auth.js</span>         <span class="comment">← /api/auth/* (OTP, employee login)</span>
+│   └── <span class="file new">tickets.js</span>      <span class="comment">← /api/tickets/* (CRUD)</span>
+├── <span class="dir">public/</span>              <span class="comment">← served statically</span>
+│   ├── <span class="file edit">index.html</span>       <span class="comment">← add theme-toggle button here</span>
+│   ├── <span class="dir">css/</span>
+│   │   ├── <span class="file new">theme.css</span>    <span class="comment">← light/dark mode vars + overrides</span>
+│   │   ├── <span class="file">variables.css</span>
+│   │   ├── <span class="file">auth.css</span>
+│   │   ├── <span class="file">customer.css</span>
+│   │   ├── <span class="file">layout.css</span>
+│   │   ├── <span class="file">sidebar.css</span>
+│   │   ├── <span class="file">topbar.css</span>
+│   │   ├── <span class="file">dashboard.css</span>
+│   │   ├── <span class="file">table.css</span>
+│   │   ├── <span class="file">panel.css</span>
+│   │   ├── <span class="file">modal.css</span>
+│   │   ├── <span class="file">badges.css</span>
+│   │   └── <span class="file">components.css</span>
+│   ├── <span class="dir">js/</span>
+│   │   ├── <span class="file new">theme.js</span>     <span class="comment">← load in &lt;head&gt; to prevent flash</span>
+│   │   ├── <span class="file edit">auth.js</span>      <span class="comment">← now calls /api/auth/* endpoints</span>
+│   │   ├── <span class="file edit">data.js</span>      <span class="comment">← now calls /api/tickets/* endpoints</span>
+│   │   ├── <span class="file">utils.js</span>
+│   │   ├── <span class="file">render.js</span>
+│   │   ├── <span class="file">panel.js</span>
+│   │   ├── <span class="file">modal.js</span>
+│   │   ├── <span class="file">customer.js</span>
+│   │   └── <span class="file">app.js</span>
+│   └── <span class="dir">assets/</span>
+│       └── <span class="dir">support/</span>
+│           ├── <span class="dir">bootstrap-5.3.8-dist/</span>
+│           └── <span class="dir">js/</span>
+│               └── jquery-4.0.0.min.js
+└── node_modules/
+    </div>
+  </section>
+
+  <!-- ── 2. Color Palette ───────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">2. Color palette</div>
+      <div class="section-file">css/variables.css + css/theme.css</div>
+    </div>
+
+    <div class="sub-title">Semantic (adapts to light/dark)</div>
+    <div class="swatch-grid" style="margin-bottom:24px;">
+      <div class="swatch"><div class="swatch-color" style="background:var(--bg-primary);border:1px solid var(--border-default);"></div><div class="swatch-info"><div class="swatch-name">bg-primary</div>#ffffff / #1c1c1a</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--bg-secondary);"></div><div class="swatch-info"><div class="swatch-name">bg-secondary</div>#f5f5f3 / #252523</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--bg-tertiary);"></div><div class="swatch-info"><div class="swatch-name">bg-tertiary</div>#ededea / #2e2e2b</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--text-primary);border-radius:8px;"></div><div class="swatch-info"><div class="swatch-name">text-primary</div>#1a1a18 / #f0efe8</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--text-secondary);border-radius:8px;"></div><div class="swatch-info"><div class="swatch-name">text-secondary</div>#5a5a57 / #b0b0a8</div></div>
+    </div>
+
+    <div class="sub-title">Brand colors (use CSS variables from variables.css)</div>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#378ADD;"></div><div class="swatch-info"><div class="swatch-name">Blue 400</div>Primary actions</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7F77DD;"></div><div class="swatch-info"><div class="swatch-name">Purple 400</div>Internal type</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1D9E75;"></div><div class="swatch-info"><div class="swatch-name">Teal 400</div>External type</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#639922;"></div><div class="swatch-info"><div class="swatch-name">Green 400</div>Resolved/success</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#BA7517;"></div><div class="swatch-info"><div class="swatch-name">Amber 400</div>In progress/warn</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E24B4A;"></div><div class="swatch-info"><div class="swatch-name">Red 400</div>High/critical</div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#888780;"></div><div class="swatch-info"><div class="swatch-name">Gray 400</div>Neutral</div></div>
+    </div>
+  </section>
+
+  <!-- ── 3. Typography ──────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">3. Typography</div>
+      <div class="section-file">DM Sans + DM Mono (Google Fonts)</div>
+    </div>
+    <div class="preview-card">
+      <div class="type-specimen"><div class="type-meta">22px / 600 — Page headings</div><div style="font-size:22px;font-weight:600;letter-spacing:-0.02em;">OMTPI HelpDesk</div></div>
+      <div class="type-specimen"><div class="type-meta">18px / 600 — Section headings (h2)</div><div style="font-size:18px;font-weight:600;">All tickets queue</div></div>
+      <div class="type-specimen"><div class="type-meta">15px / 500 — Card titles / topbar</div><div style="font-size:15px;font-weight:500;">Ticket TK-0042 · API returning 401 errors</div></div>
+      <div class="type-specimen"><div class="type-meta">14px / 400 — Body text</div><div style="font-size:14px;color:var(--text-secondary);">Please provide as much detail as possible about your issue, including steps to reproduce and any error messages you've encountered.</div></div>
+      <div class="type-specimen"><div class="type-meta">13px / 400 — Table rows, labels</div><div style="font-size:13px;color:var(--text-secondary);">Maria Santos · IT Support · 2026-04-14</div></div>
+      <div class="type-specimen"><div class="type-meta">12px / 500 — Meta labels (uppercase)</div><div style="font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--text-tertiary);">Priority · Department · Updated</div></div>
+      <div class="type-specimen"><div class="type-meta">12px DM Mono — IDs, code</div><div style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text-secondary);">TK-0042 &nbsp;|&nbsp; +63 917 123 4567 &nbsp;|&nbsp; agent@omtpi.com.ph</div></div>
+    </div>
+  </section>
+
+  <!-- ── 4. Badges ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">4. Badges</div>
+      <div class="section-file">css/badges.css</div>
+    </div>
+
+    <div class="sub-title">Priority</div>
+    <div class="row">
+      <span class="pri-badge pri-low">low</span>
+      <span class="pri-badge pri-medium">medium</span>
+      <span class="pri-badge pri-high">high</span>
+      <span class="pri-badge pri-critical">critical</span>
+    </div>
+
+    <div class="sub-title">Status</div>
+    <div class="row">
+      <span class="status-badge status-open">open</span>
+      <span class="status-badge status-progress">progress</span>
+      <span class="status-badge status-resolved">resolved</span>
+      <span class="status-badge status-closed">closed</span>
+    </div>
+
+    <div class="sub-title">Ticket type</div>
+    <div class="row">
+      <span class="type-badge type-internal">Internal</span>
+      <span class="type-badge type-external">External</span>
+    </div>
+
+    <div class="sub-title">Sidebar count badges</div>
+    <div class="row">
+      <span class="badge badge-blue">12</span>
+      <span class="badge badge-purple">5</span>
+      <span class="badge badge-teal">7</span>
+    </div>
+
+    <pre>.pri-badge.pri-low       → green
+.pri-badge.pri-medium    → amber
+.pri-badge.pri-high      → red
+.pri-badge.pri-critical  → dark red
+
+.status-badge.status-open      → blue
+.status-badge.status-progress  → amber
+.status-badge.status-resolved  → green
+.status-badge.status-closed    → gray
+
+.type-badge.type-internal → purple
+.type-badge.type-external → teal</pre>
+  </section>
+
+  <!-- ── 5. Buttons ────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">5. Buttons</div>
+      <div class="section-file">css/components.css</div>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary">+ New ticket</button>
+      <button class="btn">Cancel</button>
+      <button class="btn btn-danger">Delete</button>
+      <button class="btn btn-sm">Small</button>
+      <button class="btn-auth" style="width:auto;padding:10px 24px;">Auth button</button>
+    </div>
+    <pre>&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn"&gt;Default&lt;/button&gt;
+&lt;button class="btn btn-danger"&gt;Danger&lt;/button&gt;
+&lt;button class="btn btn-sm"&gt;Small&lt;/button&gt;
+&lt;button class="btn-auth"&gt;Auth full-width&lt;/button&gt;</pre>
+  </section>
+
+  <!-- ── 6. Avatars ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">6. Avatars</div>
+      <div class="section-file">css/components.css → .avatar .avatar-0…4</div>
+    </div>
+    <div class="row">
+      <div class="avatar avatar-0">MS</div>
+      <div class="avatar avatar-1">JL</div>
+      <div class="avatar avatar-2">CR</div>
+      <div class="avatar avatar-3">PM</div>
+      <div class="avatar avatar-4">AF</div>
+    </div>
+    <pre>avatarClass(index) → "avatar-0" through "avatar-4"
+Use getInitials(name) to derive the 2-letter label.</pre>
+  </section>
+
+  <!-- ── 7. Spacing ────────────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">7. Spacing scale</div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
+      <div><div class="spacing-block" style="width:4px;height:4px;"></div><div class="spacing-label">4px</div></div>
+      <div><div class="spacing-block" style="width:8px;height:8px;"></div><div class="spacing-label">8px</div></div>
+      <div><div class="spacing-block" style="width:12px;height:12px;"></div><div class="spacing-label">12px</div></div>
+      <div><div class="spacing-block" style="width:16px;height:16px;"></div><div class="spacing-label">16px</div></div>
+      <div><div class="spacing-block" style="width:20px;height:20px;"></div><div class="spacing-label">20px</div></div>
+      <div><div class="spacing-block" style="width:24px;height:24px;"></div><div class="spacing-label">24px</div></div>
+      <div><div class="spacing-block" style="width:32px;height:32px;"></div><div class="spacing-label">32px</div></div>
+      <div><div class="spacing-block" style="width:40px;height:40px;"></div><div class="spacing-label">40px</div></div>
+    </div>
+    <pre>--radius-sm: 6px    --radius-md: 8px
+--radius-lg: 12px   --radius-xl: 16px   --radius-pill: 9999px</pre>
+  </section>
+
+  <!-- ── 8. CSS file responsibility map ─────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">8. CSS file responsibility</div>
+      <div class="section-file">Edit the right file to change the right thing</div>
+    </div>
+    <div class="preview-card" style="font-size:13px;line-height:2;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="text-align:left;padding:4px 12px 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);border-bottom:0.5px solid var(--border-default);">File</th>
+          <th style="text-align:left;padding:4px 0;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);border-bottom:0.5px solid var(--border-default);">What to edit here</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--color-blue-400);">theme.css</td><td>Light/dark mode colors, toggle button, transition speeds</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">variables.css</td><td>Brand color palette, radius tokens, z-index layers</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">reset.css</td><td>Browser normalization (rarely touch this)</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">layout.css</td><td>App shell flex layout, scrollbars, .hidden utility</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">sidebar.css</td><td>Sidebar width, nav items, nav dots, sidebar footer, sign out button</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">topbar.css</td><td>Top header bar, search input width, topbar spacing</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">dashboard.css</td><td>Stat cards grid, tab styles</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">table.css</td><td>Ticket list table, filter buttons, column widths, empty state</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">panel.css</td><td>Slide-in detail panel, comments, status control buttons</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">modal.css</td><td>New-ticket modal, form field layout, type selector</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">badges.css</td><td>Priority, status, type, and count badge colors</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">components.css</td><td>Buttons (.btn, .btn-primary), avatars (.avatar-*), toast</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">auth.css</td><td>Auth gate screens, role cards, OTP digit inputs, cooldown banner</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-secondary);">customer.css</td><td>Customer portal top bar, submit form, cooldown card, success card</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 9. Theme toggle HTML snippet ─────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">9. Adding the theme toggle button</div>
+      <div class="section-file">index.html — paste into topbar + &lt;head&gt;</div>
+    </div>
+    <pre>&lt;!-- In &lt;head&gt; — BEFORE other CSS, prevents flash --&gt;
+&lt;script src="/js/theme.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="/css/theme.css" /&gt;
+
+&lt;!-- In .topbar, next to search input --&gt;
+&lt;button class="theme-toggle" id="theme-toggle" title="Toggle theme"&gt;
+  &lt;svg class="icon-sun" ...&gt;...&lt;/svg&gt;   &lt;!-- shown in light mode --&gt;
+  &lt;svg class="icon-moon" ...&gt;...&lt;/svg&gt;  &lt;!-- shown in dark mode --&gt;
+&lt;/button&gt;</pre>
+    <p style="font-size:13px;color:var(--text-secondary);margin-top:12px;">
+      The full SVG code for both icons is already in <code style="font-family:'DM Mono',monospace;">design-guide.html</code>'s topbar above — copy it from there.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

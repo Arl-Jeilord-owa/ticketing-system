@@ -1,0 +1,185 @@
+/*
+ * theme.css — Light / Dark mode
+ * ─────────────────────────────────────────────────────────────
+ * How it works:
+ *   - Default = light mode (no class on <html>)
+ *   - Dark mode = <html class="dark"> set by theme.js
+ *   - User preference saved in localStorage key: "omtpi-theme"
+ *   - Toggle button: #theme-toggle (added to topbar in index.html)
+ * ─────────────────────────────────────────────────────────────
+ */
+
+/* ── Light mode (default) ─────────────────────────────────── */
+:root {
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f5f5f3;
+  --bg-tertiary:   #ededea;
+
+  --text-primary:   #1a1a18;
+  --text-secondary: #5a5a57;
+  --text-tertiary:  #999990;
+
+  --border-default: rgba(0,0,0,.10);
+  --border-medium:  rgba(0,0,0,.18);
+  --border-strong:  rgba(0,0,0,.28);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.06);
+
+  /* Sidebar uses a slightly warm tone in light mode */
+  --sidebar-bg:     #f0efe8;
+  --sidebar-border: rgba(0,0,0,.09);
+
+  /* Input backgrounds */
+  --input-bg:       #ffffff;
+  --input-bg-focus: #ffffff;
+
+  /* Auth gate background */
+  --auth-bg: #f0efe8;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+html.dark {
+  --bg-primary:    #1c1c1a;
+  --bg-secondary:  #252523;
+  --bg-tertiary:   #2e2e2b;
+
+  --text-primary:   #f0efe8;
+  --text-secondary: #b0b0a8;
+  --text-tertiary:  #737370;
+
+  --border-default: rgba(255,255,255,.08);
+  --border-medium:  rgba(255,255,255,.14);
+  --border-strong:  rgba(255,255,255,.22);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3),  0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.5), 0 4px 8px rgba(0,0,0,.4);
+
+  --sidebar-bg:     #212120;
+  --sidebar-border: rgba(255,255,255,.07);
+
+  --input-bg:       #252523;
+  --input-bg-focus: #2e2e2b;
+
+  --auth-bg: #1a1a18;
+}
+
+/* ── Use sidebar-specific vars ───────────────────────────── */
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right-color: var(--sidebar-border);
+}
+
+/* ── Auth gate background ─────────────────────────────────── */
+#auth-gate {
+  background: var(--auth-bg);
+}
+
+/* ── Input backgrounds ────────────────────────────────────── */
+.auth-input,
+.phone-number-input,
+.phone-country-select,
+.otp-digit,
+.field input,
+.field select,
+.field textarea,
+.c-field input,
+.c-field select,
+.c-field textarea,
+.search {
+  background: var(--input-bg) !important;
+}
+.auth-input:focus,
+.phone-number-input:focus,
+.otp-digit:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.c-field input:focus,
+.c-field textarea:focus,
+.search:focus {
+  background: var(--input-bg-focus) !important;
+}
+
+/* ── Badge / pill dark-mode adjustments ──────────────────── */
+html.dark .pri-low      { background: #27500A; color: #C0DD97; }
+html.dark .pri-medium   { background: #633806; color: #FAC775; }
+html.dark .pri-high     { background: #791F1F; color: #F09595; }
+html.dark .pri-critical { background: #501313; color: #F7C1C1; }
+
+html.dark .status-open     { background: #0C447C; color: #B5D4F4; }
+html.dark .status-progress { background: #633806; color: #FAC775; }
+html.dark .status-resolved { background: #27500A; color: #C0DD97; }
+html.dark .status-closed   { background: #444441; color: #D3D1C7; }
+
+html.dark .type-internal { background: #3C3489; color: #CECBF6; }
+html.dark .type-external { background: #085041; color: #9FE1CB; }
+
+html.dark .badge-blue   { background: #0C447C; color: #B5D4F4; }
+html.dark .badge-purple { background: #3C3489; color: #CECBF6; }
+html.dark .badge-teal   { background: #085041; color: #9FE1CB; }
+
+html.dark .role-pill          { background: #085041; color: #9FE1CB; }
+html.dark .role-pill.employee { background: #3C3489; color: #CECBF6; }
+
+html.dark .dev-banner {
+  background: #2e2e2b;
+  border-color: rgba(255,255,255,.12);
+}
+
+html.dark .stat-card {
+  background: #252523;
+  border-color: rgba(255,255,255,.07);
+}
+
+html.dark .ticket-table { background: #1c1c1a; }
+html.dark .ticket-table th { background: #252523; }
+
+html.dark .comment { background: #252523; }
+
+html.dark .customer-cooldown-card {
+  background: #3a2a08;
+  border-color: rgba(186,117,23,.25);
+}
+html.dark .customer-form-card { background: #252523; }
+html.dark .customer-form-header { border-color: rgba(255,255,255,.08); }
+html.dark .customer-success-card { background: #17340a; border-color: rgba(99,153,34,.2); }
+
+/* ── Theme toggle button ─────────────────────────────────── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border-medium);
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background .15s, color .15s, border-color .15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.theme-toggle .icon-sun  { display: block; }
+.theme-toggle .icon-moon { display: none; }
+html.dark .theme-toggle .icon-sun  { display: none; }
+html.dark .theme-toggle .icon-moon { display: block; }
+
+/* ── Smooth theme transition ─────────────────────────────── */
+*, *::before, *::after {
+  transition:
+    background-color .2s ease,
+    border-color     .2s ease,
+    color            .15s ease;
+}
+/* But not on SVG paths or transform-driven animations */
+svg *, .nav-item, .btn, .btn-auth, .role-card { transition: none; }
+.nav-item, .btn, .btn-auth, .role-card {
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
