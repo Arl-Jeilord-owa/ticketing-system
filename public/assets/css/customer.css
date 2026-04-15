@@ -17,13 +17,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
-  flex: 1;
   letter-spacing: -0.01em;
 }
-.customer-logo svg { color: var(--color-blue-400); }
+
+.customer-logo-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.customer-logo-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
 
 .customer-user-info {
   font-size: 13px;
@@ -40,6 +54,7 @@
   cursor: pointer;
   transition: background .15s, color .15s;
 }
+
 .btn-signout-sm:hover {
   background: var(--bg-secondary);
   color: var(--text-primary);
