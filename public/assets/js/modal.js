@@ -56,7 +56,7 @@ const Modal = (() => {
   }
 
   function submit() {
-    const subject   = $('new-subject')   ? $('new-subject').value.trim()   : '';
+    const subject = $('new-subject') ? $('new-subject').value.trim() : '';
     const requester = $('new-requester') ? $('new-requester').value.trim() : '';
 
     if (!subject || !requester) {
@@ -64,14 +64,28 @@ const Modal = (() => {
       return;
     }
 
-    const ticket = TicketStore.create({
-      type:        selectedType,
-      dept:        $('new-dept')     ? $('new-dept').value       : 'IT',
-      subject,
-      priority:    $('new-priority') ? $('new-priority').value   : 'medium',
-      requester,
-      description: $('new-desc')     ? $('new-desc').value.trim(): '',
-    });
+    const ticket = fetch('/api/tickets', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        subject,
+        category: cat,
+        priority,
+        description: desc,
+        phone: session.phone
+      })
+    })
+      .then(res => res.json())
+      .then(ticket => {
+        renderSuccess($('customer-content'), ticket, name);
+      })
+      .catch(() => {
+        alert('Failed to submit ticket');
+      });
 
     close();
     App.navigateTo('all');

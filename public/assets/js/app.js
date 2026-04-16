@@ -145,6 +145,7 @@ const App = (() => {
     });
 
     const signoutBtn = $('btn-signout');
+    
     if (signoutBtn) signoutBtn.addEventListener('click', () => Auth.handleSignOut());
   }
 

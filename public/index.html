@@ -10,19 +10,20 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/reset.css" />
-  <link rel="stylesheet" href="assets/css/variables.css" />
-  <link rel="stylesheet" href="assets/css/auth.css" />
-  <link rel="stylesheet" href="assets/css/layout.css" />
-  <link rel="stylesheet" href="assets/css/sidebar.css" />
-  <link rel="stylesheet" href="assets/css/topbar.css" />
-  <link rel="stylesheet" href="assets/css/dashboard.css" />
-  <link rel="stylesheet" href="assets/css/table.css" />
-  <link rel="stylesheet" href="assets/css/panel.css" />
-  <link rel="stylesheet" href="assets/css/modal.css" />
-  <link rel="stylesheet" href="assets/css/badges.css" />
-  <link rel="stylesheet" href="assets/css/components.css" />
-  <link rel="stylesheet" href="assets/css/customer.css" />
+  <link rel="stylesheet" href="/assets/css/reset.css" />
+  <link rel="stylesheet" href="/assets/css/variables.css" />
+  <link rel="stylesheet" href="/assets/css/theme.css" />
+  <link rel="stylesheet" href="/assets/css/auth.css" />
+  <link rel="stylesheet" href="/assets/css/layout.css" />
+  <link rel="stylesheet" href="/assets/css/sidebar.css" />
+  <link rel="stylesheet" href="/assets/css/topbar.css" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/table.css" />
+  <link rel="stylesheet" href="/assets/css/panel.css" />
+  <link rel="stylesheet" href="/assets/css/modal.css" />
+  <link rel="stylesheet" href="/assets/css/badges.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/customer.css" />
 </head>
 
 <body>
@@ -39,7 +40,7 @@
           </div>
           <div>
             <div class="auth-logo-name">OMTPI HelpDesk</div>
-            <div class="auth-logo-tagline">Support ticketing system</div>
+            <div class="auth-logo-tagline">Industrial Support and Maintenance Ticket System</div>
           </div>
         </div>
         <h1 class="auth-heading">Who are you?</h1>
@@ -187,7 +188,7 @@
             </div>
             <div>
               <div class="logo-text">OMTPI HelpDesk</div>
-              <div class="logo-sub">Agent portal</div>
+              <div class="logo-sub">Operations and Maintenance Portal</div>
             </div>
           </div>
           <div class="nav-section">Overview</div>
@@ -198,6 +199,8 @@
               <rect x="1" y="9" width="6" height="6" rx="1" />
               <rect x="9" y="9" width="6" height="6" rx="1" />
             </svg>Dashboard</div>
+            <div class="nav-item" data-view="favorites"><span class="nav-dot dot-green"></span>Favorites</div>
+          <div class="nav-item" data-view="archived"><span class="nav-dot dot-gray"></span>Archived</div>
           <div class="nav-section">Queues</div>
           <div class="nav-item" data-view="all"><span class="nav-dot dot-gray"></span>All tickets<span
               class="badge badge-blue" id="badge-all">0</span></div>
@@ -216,14 +219,34 @@
               out</button>
           </div>
         </aside>
-        <div class="main">
-          <header class="topbar">
-            <h1 class="topbar-title" id="view-title">Dashboard</h1>
-            <input class="search" type="text" id="search-input" placeholder="Search tickets…" autocomplete="off" />
-            <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
-          </header>
-          <div class="content" id="content-area"></div>
-        </div>
+<div class="main">
+  <header class="topbar">
+    <h1 class="topbar-title" id="view-title">Dashboard</h1>
+    <input class="search" type="text" id="search-input" placeholder="Search tickets…" autocomplete="off" />
+
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2"></path>
+        <path d="M12 20v2"></path>
+        <path d="M4.93 4.93l1.41 1.41"></path>
+        <path d="M17.66 17.66l1.41 1.41"></path>
+        <path d="M2 12h2"></path>
+        <path d="M20 12h2"></path>
+        <path d="M4.93 19.07l1.41-1.41"></path>
+        <path d="M17.66 6.34l1.41-1.41"></path>
+      </svg>
+
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+      </svg>
+    </button>
+
+    <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
+  </header>
+
+  <div class="content" id="content-area"></div>
+</div>
         <aside class="panel" id="detail-panel">
           <div class="panel-header">
             <div class="panel-title" id="panel-title">Ticket details</div><button class="btn"
@@ -239,10 +262,33 @@
     <!-- Customer submit portal -->
     <div id="customer-portal" class="hidden">
       <div class="customer-topbar">
-        <div class="customer-logo">
-          <img src="/assets/images/LOGO_omtpi.png" class="customer-logo-img" alt="OMTPI Logo">
-          <div class="customer-logo-name">OMTPI Support</div>
-        </div>
+  <div class="customer-logo">
+    <img src="/assets/images/LOGO_omtpi.png" class="customer-logo-img" alt="OMTPI Logo">
+    <div class="customer-logo-name">OMTPI Support</div>
+  </div>
+
+  <div class="customer-user-info" id="customer-user-info"></div>
+
+  <button class="theme-toggle" id="theme-toggle-customer" type="button" aria-label="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2"></path>
+      <path d="M12 20v2"></path>
+      <path d="M4.93 4.93l1.41 1.41"></path>
+      <path d="M17.66 17.66l1.41 1.41"></path>
+      <path d="M2 12h2"></path>
+      <path d="M20 12h2"></path>
+      <path d="M4.93 19.07l1.41-1.41"></path>
+      <path d="M17.66 6.34l1.41-1.41"></path>
+    </svg>
+
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+    </svg>
+  </button>
+
+  <button class="btn-signout-sm" id="btn-customer-signout">Sign out</button>
+</div>
         <div class="customer-user-info" id="customer-user-info"></div>
         <button class="btn-signout-sm" id="btn-customer-signout">Sign out</button>
       </div>
@@ -251,14 +297,15 @@
 
   </div><!-- /#app-shell -->
 
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/auth.js"></script>
-  <script src="assets/js/render.js"></script>
-  <script src="assets/js/panel.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/customer.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="/assets/js/data.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/render.js"></script>
+  <script src="/assets/js/panel.js"></script>
+  <script src="/assets/js/modal.js"></script>
+  <script src="/assets/js/customer.js"></script>
+  <script src="/assets/js/app.js"></script>
+  <script src="/assets/js/theme.js"></script>
   <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
 </body>
 

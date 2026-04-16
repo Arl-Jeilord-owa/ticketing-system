@@ -101,14 +101,16 @@ function renderPanelBody(tk) {
     </div>`).join('');
 
   const statusBtns = ['open', 'progress', 'resolved', 'closed'].map(s => `
-    <button class="filter-btn${tk.status === s ? ' active' : ''}" data-status="${s}">${escapeHtml(s)}</button>`
-  ).join('');
+    <button class="filter-btn${tk.status === s ? ' active' : ''}" data-status="${s}">${escapeHtml(s)}</button>
+  `).join('');
 
   return `
     <div class="detail-badges">
       <span class="status-badge ${statusClass(tk.status)}">${escapeHtml(tk.status)}</span>
       <span class="pri-badge ${priorityClass(tk.priority)}">${escapeHtml(tk.priority)} priority</span>
       <span class="type-badge ${typeClass(tk.type)}">${tk.type}</span>
+      ${tk.favorite ? '<span class="badge badge-teal">Favorite</span>' : ''}
+      ${tk.archived ? '<span class="badge badge-purple">Archived</span>' : ''}
     </div>
 
     <div class="detail-subject">${escapeHtml(tk.subject)}</div>
@@ -136,6 +138,16 @@ function renderPanelBody(tk) {
       <div class="status-controls-label">Update status</div>
       <div class="status-btns" id="status-btn-group">
         ${statusBtns}
+      </div>
+    </div>
+
+    <div class="status-controls">
+      <div class="status-controls-label">Ticket actions</div>
+      <div class="status-btns" id="ticket-action-group">
+        <button class="filter-btn" data-action="favorite">${tk.favorite ? 'Unfavorite' : 'Favorite'}</button>
+        <button class="filter-btn" data-action="archive">${tk.archived ? 'Unarchive' : 'Archive'}</button>
+        <button class="filter-btn" data-action="edit">Edit</button>
+        <button class="filter-btn" data-action="delete">Delete</button>
       </div>
     </div>
 

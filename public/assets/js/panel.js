@@ -1,8 +1,3 @@
-/**
- * panel.js
- * Slide-in detail panel: open, close, status updates, comments.
- */
-
 const Panel = (() => {
   let currentTicketId = null;
 
@@ -10,61 +5,104 @@ const Panel = (() => {
     const tk = TicketStore.getById(ticketId);
     if (!tk) return;
     currentTicketId = ticketId;
+    renderCurrent();
+    $('detail-panel').classList.add('open');
+  }
 
-    $('panel-title').textContent = tk.id + ' · ' + (tk.subject.length > 35 ? tk.subject.slice(0, 35) + '…' : tk.subject);
+  function renderCurrent() {
+    const tk = TicketStore.getById(currentTicketId);
+    if (!tk) {
+      close();
+      return;
+    }
+
+    $('panel-title').textContent =
+      tk.id + ' · ' + (tk.subject.length > 35 ? tk.subject.slice(0, 35) + '…' : tk.subject);
+
     $('panel-body').innerHTML = renderPanelBody(tk);
     $('panel-footer').innerHTML = `
-      <button class="btn" id="panel-cancel-btn">Cancel</button>
+      <button class="btn" id="panel-cancel-btn">Close</button>
       <button class="btn btn-primary" id="panel-comment-btn">Add comment</button>`;
 
-    // Status buttons
-    $('status-btn-group').addEventListener('click', e => {
-      const btn = e.target.closest('[data-status]');
-      if (!btn) return;
-      const newStatus = btn.dataset.status;
-      TicketStore.setStatus(currentTicketId, newStatus);
-      // Refresh panel badges and buttons
-      const updated = TicketStore.getById(currentTicketId);
-      qsa('[data-status]', $('status-btn-group')).forEach(b => {
-        b.classList.toggle('active', b.dataset.status === newStatus);
+    const statusGroup = $('status-btn-group');
+    if (statusGroup) {
+      statusGroup.addEventListener('click', e => {
+        const btn = e.target.closest('[data-status]');
+        if (!btn) return;
+        TicketStore.setStatus(currentTicketId, btn.dataset.status);
+        renderCurrent();
+        App.refreshContent();
+        showToast('Status updated');
       });
-      // Update status badge in panel header
-      const badgeEl = qs('.detail-badges .status-badge', $('panel-body'));
-      if (badgeEl) {
-        badgeEl.textContent = newStatus;
-        badgeEl.className = 'status-badge ' + statusClass(newStatus);
-      }
-      App.refreshContent();
-      showToast('Status updated to "' + newStatus + '"');
-    });
+    }
 
-    // Comment button
-    $('panel-footer').addEventListener('click', e => {
-      if (e.target.id === 'panel-cancel-btn') { close(); return; }
-      if (e.target.id === 'panel-comment-btn') { submitComment(); }
-    });
+    const actions = $('ticket-action-group');
+    if (actions) {
+      actions.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
 
-    $('detail-panel').classList.add('open');
+        const action = btn.dataset.action;
+
+        if (action === 'favorite') {
+          TicketStore.toggleFavorite(currentTicketId);
+          renderCurrent();
+          App.refreshContent();
+          showToast('Favorite updated');
+          return;
+        }
+
+        if (action === 'archive') {
+          TicketStore.toggleArchive(currentTicketId);
+          renderCurrent();
+          App.refreshContent();
+          showToast('Archive updated');
+          return;
+        }
+
+        if (action === 'edit') {
+          const tk = TicketStore.getById(currentTicketId);
+          const subject = prompt('Edit subject:', tk.subject);
+          if (subject === null) return;
+
+          const description = prompt('Edit description:', tk.description || '');
+          if (description === null) return;
+
+          TicketStore.update(currentTicketId, {
+            subject: subject.trim() || tk.subject,
+            description: description.trim()
+          });
+
+          renderCurrent();
+          App.refreshContent();
+          showToast('Ticket updated');
+          return;
+        }
+
+        if (action === 'delete') {
+          if (!confirm('Delete this ticket permanently?')) return;
+          TicketStore.remove(currentTicketId);
+          close();
+          App.refreshContent();
+          showToast('Ticket deleted');
+        }
+      });
+    }
+
+    $('panel-cancel-btn')?.addEventListener('click', close);
+    $('panel-comment-btn')?.addEventListener('click', submitComment);
   }
 
   function submitComment() {
     const textarea = $('new-comment');
     const text = textarea ? textarea.value.trim() : '';
-    if (!text) { showToast('Please write a comment first.'); return; }
+    if (!text) {
+      showToast('Please write a comment first.');
+      return;
+    }
 
     TicketStore.addComment(currentTicketId, { author: 'Agent', text });
-    textarea.value = '';
-
-    // Refresh comment list
-    const tk = TicketStore.getById(currentTicketId);
-    const commentList = $('comment-list');
-    if (commentList) {
-      commentList.innerHTML = tk.comments.map(c => `
-        <div class="comment">
-          <div class="comment-meta">${escapeHtml(c.author)} · ${escapeHtml(c.time)}</div>
-          ${escapeHtml(c.text)}
-        </div>`).join('');
-    }
+    renderCurrent();
     App.refreshContent();
     showToast('Comment added');
   }

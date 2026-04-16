@@ -12,15 +12,15 @@
 
 const CustomerPortal = (() => {
 
-  let session       = null;
-  let signOutCb     = null;
+  let session = null;
+  let signOutCb = null;
   let cooldownTimer = null;
 
   /* ─────────────────────────────────────────
      Init
   ───────────────────────────────────────── */
   function init(sess, signOutCallback) {
-    session   = sess;
+    session = sess;
     signOutCb = signOutCallback;
 
     $('btn-customer-signout').addEventListener('click', () => {
@@ -39,7 +39,7 @@ const CustomerPortal = (() => {
     const area = $('customer-content');
 
     // Cooldown was set at OTP verify — check remaining
-    const key       = session.phone; // already formatted as "+63XXXXXXXXXX"
+    const key = session.phone; // already formatted as "+63XXXXXXXXXX"
     const remaining = Auth.getRemainingCooldown(key);
 
     if (remaining > 0) {
@@ -74,7 +74,7 @@ const CustomerPortal = (() => {
 
     cooldownTimer = setInterval(() => {
       const rem = Auth.getRemainingCooldown(key);
-      const el  = $('cooldown-countdown');
+      const el = $('cooldown-countdown');
       if (rem <= 0) {
         clearInterval(cooldownTimer);
         renderForm($('customer-content'));
@@ -157,12 +157,12 @@ const CustomerPortal = (() => {
      Form submission
   ───────────────────────────────────────── */
   function handleSubmit() {
-    const name     = $('c-name')        ? $('c-name').value.trim()        : '';
-    const email    = $('c-email')       ? $('c-email').value.trim()       : '';
-    const subject  = $('c-subject')     ? $('c-subject').value.trim()     : '';
-    const cat      = $('c-category')    ? $('c-category').value           : 'Other';
-    const priority = $('c-priority')    ? $('c-priority').value           : 'medium';
-    const desc     = $('c-description') ? $('c-description').value.trim() : '';
+    const name = $('c-name') ? $('c-name').value.trim() : '';
+    const email = $('c-email') ? $('c-email').value.trim() : '';
+    const subject = $('c-subject') ? $('c-subject').value.trim() : '';
+    const cat = $('c-category') ? $('c-category').value : 'Other';
+    const priority = $('c-priority') ? $('c-priority').value : 'medium';
+    const desc = $('c-description') ? $('c-description').value.trim() : '';
 
     const errEl = $('form-error');
     if (errEl) errEl.classList.add('hidden');
@@ -177,17 +177,28 @@ const CustomerPortal = (() => {
     }
 
     // Create ticket
-    const ticket = TicketStore.create({
-      type:        'external',
-      dept:        cat,
-      subject,
-      priority,
-      requester:   name,
-      assignee:    'Unassigned',
-      description: desc,
-      phone:       session.phone,
-      email,
-    });
+    fetch('/api/tickets', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        subject,
+        category: cat,
+        priority,
+        description: desc,
+        phone: session.phone
+      })
+    })
+      .then(res => res.json())
+      .then(ticket => {
+        renderSuccess($('customer-content'), ticket, name);
+      })
+      .catch(() => {
+        alert('Failed to submit ticket');
+      });
 
     // Cooldown is already active (set at OTP verify), but record submission time too
     // No need to re-set — cooldown was set at OTP
