@@ -6,7 +6,7 @@
   border-right: 0.5px solid var(--border-default);
   display: flex;
   flex-direction: column;
-  padding-bottom: 16px;
+  padding: 16px 0;
   overflow-y: auto;
 }
 
@@ -15,22 +15,6 @@
   padding: 0 16px 16px;
   border-bottom: 0.5px solid var(--border-default);
   margin-bottom: 8px;
-}
-.logo-mark {
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.logo-mark-img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  display: block;
 }
 .logo-text {
   font-size: 15px;
@@ -127,4 +111,21 @@
   background: var(--color-red-50);
   color: var(--color-red-600);
   border-color: rgba(226,75,74,.2);
+}
+
+/* ── Logo mark icon ── */
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--color-blue-50);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blue-400);
+  flex-shrink: 0;
+}
+html.dark .logo-mark {
+  background: var(--color-blue-800);
+  color: var(--color-blue-200);
 }

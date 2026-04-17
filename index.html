@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HelpDesk &mdash; OMTPI Support</title>
+
+  <!-- Load theme FIRST to avoid flash of wrong mode -->
+  <script src="js/theme.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- CSS (load order matters) -->
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/topbar.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/table.css" />
+  <link rel="stylesheet" href="css/panel.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+  <link rel="stylesheet" href="css/badges.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/customer.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     AUTH GATE
+     Screen flow:
+       1  screen-landing         role picker
+       2  screen-customer-info   name / email / location   ← customer only
+       3  screen-customer-phone  PH or JP phone number     ← customer only
+       4  screen-customer-otp    6-digit OTP               ← customer only
+       5  screen-employee-login  company email + password  ← employee only
+════════════════════════════════════════════════════════ -->
+<div id="auth-gate">
+
+  <!-- ── 1. Role picker ─────────────────────────────────── -->
+  <div id="screen-landing" class="auth-screen active">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-mark">
+          <svg viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="currentColor" opacity="0.12"/>
+            <path d="M8 22L14 10L20 18L24 14" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="14" r="2.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <div class="auth-logo-name">OMTPI HelpDesk</div>
+          <div class="auth-logo-tagline">Support ticketing system</div>
+        </div>
+      </div>
+
+      <h1 class="auth-heading">Who are you?</h1>
+      <p class="auth-subheading">Choose how you&rsquo;re accessing support today.</p>
+
+      <div class="role-grid">
+        <button class="role-card" id="btn-role-customer">
+          <div class="role-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="role-label">Customer / Client</div>
+          <div class="role-desc">Submit a support ticket for products or services</div>
+          <div class="role-pill">OTP via phone</div>
+        </button>
+
+        <button class="role-card" id="btn-role-employee">
+          <div class="role-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+          </div>
+          <div class="role-label">Employee</div>
+          <div class="role-desc">Manage, view, and resolve internal or external tickets</div>
+          <div class="role-pill employee">@omtpi.com.ph email</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Customer personal info ──────────────────────── -->
+  <div id="screen-customer-info" class="auth-screen">
+    <div class="auth-card auth-card-wide">
+      <button class="auth-back" id="back-from-info">&#8592; Back</button>
+      <div class="auth-step-label">Customer verification &middot; Step 1 of 3</div>
+      <h1 class="auth-heading">Tell us about yourself</h1>
+      <p class="auth-subheading">This helps us route your ticket and follow up with you.</p>
+
+      <div class="auth-field-row">
+        <div class="auth-field-group">
+          <label class="field-label" for="c-first-name">First name <span class="required-star">*</span></label>
+          <input type="text" id="c-first-name" class="auth-input" placeholder="Juan" autocomplete="given-name" />
+        </div>
+        <div class="auth-field-group">
+          <label class="field-label" for="c-last-name">Last name <span class="required-star">*</span></label>
+          <input type="text" id="c-last-name" class="auth-input" placeholder="dela Cruz" autocomplete="family-name" />
+        </div>
+      </div>
+
+      <div class="auth-field-group" style="margin-bottom:14px;">
+        <label class="field-label" for="c-email">Email address <span class="required-star">*</span></label>
+        <input type="email" id="c-email" class="auth-input" placeholder="juan@email.com" autocomplete="email" />
+        <div class="field-hint">We&rsquo;ll send your ticket confirmation here.</div>
+      </div>
+
+      <div class="auth-field-group" style="margin-bottom:14px;">
+        <label class="field-label" for="c-country">Country <span class="required-star">*</span></label>
+        <select id="c-country" class="auth-input auth-select">
+          <option value="">&#8212; Select country &#8212;</option>
+        </select>
+      </div>
+
+      <div class="auth-field-row">
+        <div class="auth-field-group">
+          <label class="field-label" for="c-city">City <span class="required-star">*</span></label>
+          <select id="c-city" class="auth-input auth-select" disabled>
+            <option value="">&#8212; Select country first &#8212;</option>
+          </select>
+        </div>
+        <div class="auth-field-group">
+          <label class="field-label" for="c-address">Street address</label>
+          <input type="text" id="c-address" class="auth-input"
+            placeholder="123 Rizal St, Brgy. Poblacion" autocomplete="street-address" />
+        </div>
+      </div>
+
+      <div class="auth-error hidden" id="info-error"></div>
+      <button class="btn-auth" id="btn-info-next" style="margin-top:8px;">
+        Continue &#8594;
+      </button>
+    </div>
+  </div>
+
+  <!-- ── 3. Phone number ─────────────────────────────────── -->
+  <div id="screen-customer-phone" class="auth-screen">
+    <div class="auth-card">
+      <button class="auth-back" id="back-from-phone">&#8592; Back</button>
+      <div class="auth-step-label">Customer verification &middot; Step 2 of 3</div>
+      <h1 class="auth-heading">Enter your phone number</h1>
+      <p class="auth-subheading">We&rsquo;ll send a one-time password via SMS.<br>
+        Philippines and Japan numbers only.</p>
+
+      <div class="phone-input-group">
+        <select id="phone-country" class="phone-country-select">
+          <option value="+63">&#127477;&#127469; +63</option>
+          <option value="+81">&#127471;&#127477; +81</option>
+        </select>
+        <input type="tel" id="phone-number" class="phone-number-input"
+          placeholder="9171234567" maxlength="12" autocomplete="tel" />
+      </div>
+      <div class="field-hint">PH: without leading zero &nbsp;&bull;&nbsp; JP: include area code</div>
+
+      <div class="auth-error hidden" id="phone-error"></div>
+
+      <div class="cooldown-banner hidden" id="cooldown-banner">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0
+               00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+            clip-rule="evenodd"/>
+        </svg>
+        <span id="cooldown-text">Please wait before submitting another ticket.</span>
+      </div>
+
+      <button class="btn-auth" id="btn-send-otp">Send OTP</button>
+    </div>
+  </div>
+
+  <!-- ── 4. OTP entry ────────────────────────────────────── -->
+  <div id="screen-customer-otp" class="auth-screen">
+    <div class="auth-card">
+      <button class="auth-back" id="back-from-otp">&#8592; Back</button>
+      <div class="auth-step-label">Customer verification &middot; Step 3 of 3</div>
+      <h1 class="auth-heading">Enter the OTP</h1>
+      <p class="auth-subheading" id="otp-sent-to">Sent to your number.</p>
+
+      <div class="otp-input-group" id="otp-inputs">
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      </div>
+
+      <div class="auth-error hidden" id="otp-error"></div>
+
+      <div class="otp-resend-row">
+        <span class="otp-timer-label">Resend in <strong id="otp-timer">60</strong>s</span>
+        <button class="btn-link hidden" id="btn-resend-otp">Resend OTP</button>
+      </div>
+
+      <div class="dev-banner">
+        Demo mode &mdash; OTP: <strong id="dev-otp-display">&#8212;&#8212;</strong>
+      </div>
+
+      <button class="btn-auth" id="btn-verify-otp">Verify &amp; Continue</button>
+    </div>
+  </div>
+
+  <!-- ── 5. Employee login ───────────────────────────────── -->
+  <div id="screen-employee-login" class="auth-screen">
+    <div class="auth-card">
+      <button class="auth-back" id="back-from-employee">&#8592; Back</button>
+      <div class="auth-step-label">Employee verification</div>
+      <h1 class="auth-heading">Sign in with your company email</h1>
+      <p class="auth-subheading">
+        Use your <strong>@omtpi.com.ph</strong> address or any address
+        registered on the <strong>all@omtpi.com.ph</strong> mailing list.
+      </p>
+
+      <div class="field-stack">
+        <div class="field-group">
+          <label class="field-label" for="emp-email">Company email</label>
+          <input type="email" id="emp-email" class="auth-input"
+            placeholder="you@omtpi.com.ph" autocomplete="email" />
+          <div class="field-hint">Must end in @omtpi.com.ph or be on the cPanel mailing list.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="emp-password">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="emp-password" class="auth-input"
+              placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              autocomplete="current-password" />
+            <button class="btn-toggle-pw" id="toggle-pw" type="button" aria-label="Toggle visibility">
+              <svg id="pw-eye-show" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg id="pw-eye-hide" class="hidden" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
+                         a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12
+                         4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-error hidden" id="emp-error"></div>
+
+      <div class="dev-banner">
+        Demo &mdash; <strong>agent@omtpi.com.ph</strong> / <strong>password123</strong>
+      </div>
+
+      <button class="btn-auth" id="btn-employee-login">Sign in</button>
+    </div>
+  </div>
+
+</div><!-- /#auth-gate -->
+
+
+<!-- ════════════════════════════════════════════════════════
+     MAIN APP  (hidden until auth passes)
+════════════════════════════════════════════════════════ -->
+<div id="app-shell" class="hidden">
+
+  <!-- ── Employee dashboard ──────────────────────────────── -->
+  <div id="employee-app" class="hidden">
+    <div class="app" id="app">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+              <path d="M4 14L8 6L12 11L15 8" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="15" cy="8" r="1.8" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">OMTPI HelpDesk</div>
+            <div class="logo-sub">Agent portal</div>
+          </div>
+        </div>
+
+        <div class="nav-section">Overview</div>
+        <div class="nav-item active" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1"/>
+            <rect x="9" y="1" width="6" height="6" rx="1"/>
+            <rect x="1" y="9" width="6" height="6" rx="1"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg>
+          Dashboard
+        </div>
+
+        <div class="nav-section">Queues</div>
+        <div class="nav-item" data-view="all">
+          <span class="nav-dot dot-gray"></span>
+          All tickets
+          <span class="badge badge-blue" id="badge-all">0</span>
+        </div>
+        <div class="nav-item" data-view="internal">
+          <span class="nav-dot dot-purple"></span>
+          Internal (IT/HR)
+          <span class="badge badge-purple" id="badge-int">0</span>
+        </div>
+        <div class="nav-item" data-view="external">
+          <span class="nav-dot dot-teal"></span>
+          External (clients)
+          <span class="badge badge-teal" id="badge-ext">0</span>
+        </div>
+
+        <div class="nav-section">Manage</div>
+        <div class="nav-item" data-view="resolved">
+          <span class="nav-dot dot-green"></span>
+          Resolved
+        </div>
+        <div class="nav-item" id="new-ticket-nav">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M8 1v14M1 8h14"/>
+          </svg>
+          New ticket
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="session-info" id="session-info"></div>
+          <button class="btn-signout" id="btn-signout">Sign out</button>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div class="main">
+        <header class="topbar">
+          <h1 class="topbar-title" id="view-title">Dashboard</h1>
+          <input class="search" type="text" id="search-input"
+            placeholder="Search tickets&hellip;" autocomplete="off" />
+          <!-- Light / dark toggle -->
+          <button class="theme-toggle" id="theme-toggle" title="Toggle light / dark mode">
+            <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4.22 1.78a1
+                1 0 011.42 1.42l-.7.7a1 1 0 01-1.42-1.42l.7-.7zM18 9a1 1 0 010 2h-1a1
+                1 0 010-2h1zM4.22 15.78a1 1 0 001.42-1.42l-.7-.7a1 1 0 00-1.42 1.42l.7.7z
+                M2 11a1 1 0 010-2h1a1 1 0 010 2H2zm13.07 2.07a1 1 0 001.42-1.42l-.7-.7a1
+                1 0 00-1.42 1.42l.7.7zM15.78 4.22a1 1 0 00-1.42 1.42l.7.7a1 1 0
+                001.42-1.42l-.7-.7zM4.93 5.64a1 1 0 00-1.42 1.42l.7.7A1 1 0
+                005.63 6.34l-.7-.7zM10 6a4 4 0 100 8 4 4 0 000-8z"/>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            </svg>
+          </button>
+          <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
+        </header>
+        <div class="content" id="content-area"></div>
+      </div>
+
+      <!-- Slide-in detail panel -->
+      <aside class="panel" id="detail-panel">
+        <div class="panel-header">
+          <div class="panel-title" id="panel-title">Ticket details</div>
+          <button class="btn" id="panel-close-btn">Close</button>
+        </div>
+        <div class="panel-body" id="panel-body"></div>
+        <div class="panel-footer" id="panel-footer"></div>
+      </aside>
+
+    </div><!-- /.app -->
+    <div id="modal-container"></div>
+  </div><!-- /#employee-app -->
+
+
+  <!-- ── Customer submit portal ──────────────────────────── -->
+  <div id="customer-portal" class="hidden">
+    <div class="customer-topbar">
+      <div class="customer-logo">
+        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+          <path d="M4 14L8 6L12 11L15 8" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="15" cy="8" r="1.8" fill="currentColor"/>
+        </svg>
+        OMTPI Support
+      </div>
+      <div class="customer-user-info" id="customer-user-info"></div>
+      <!-- Theme toggle (customer side) -->
+      <button class="theme-toggle" id="theme-toggle-customer" title="Toggle light / dark mode">
+        <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+          <path d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4.22 1.78a1 1 0
+            011.42 1.42l-.7.7a1 1 0 01-1.42-1.42l.7-.7zM18 9a1 1 0 010 2h-1a1 1 0
+            010-2h1zM4.22 15.78a1 1 0 001.42-1.42l-.7-.7a1 1 0 00-1.42 1.42l.7.7zM2
+            11a1 1 0 010-2h1a1 1 0 010 2H2zm13.07 2.07a1 1 0 001.42-1.42l-.7-.7a1 1
+            0 00-1.42 1.42l.7.7zM15.78 4.22a1 1 0 00-1.42 1.42l.7.7a1 1 0
+            001.42-1.42l-.7-.7zM4.93 5.64a1 1 0 00-1.42 1.42l.7.7A1 1 0
+            005.63 6.34l-.7-.7zM10 6a4 4 0 100 8 4 4 0 000-8z"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+        </svg>
+      </button>
+      <button class="btn-signout-sm" id="btn-customer-signout">Sign out</button>
+    </div>
+    <div class="customer-content" id="customer-content"></div>
+  </div><!-- /#customer-portal -->
+
+</div><!-- /#app-shell -->
+
+
+<!-- ── Scripts (load order: utils first, app last) ─────── -->
+<script src="js/geo-data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/render.js"></script>
+<script src="js/panel.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/customer.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

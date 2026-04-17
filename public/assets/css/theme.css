@@ -1,170 +1,83 @@
 /*
- * theme.css — OMTPI branded light / dark mode
- * Brand:
- *   Blue  = #0000FF
- *   Green = #47FF47
- *   Text  = black in light mode
+ * theme.css — Light / Dark mode
+ * ─────────────────────────────────────────────────────────────
+ * How it works:
+ *   - Default = light mode (no class on <html>)
+ *   - Dark mode = <html class="dark"> set by theme.js
+ *   - User preference saved in localStorage key: "omtpi-theme"
+ *   - Toggle button: #theme-toggle (added to topbar in index.html)
+ * ─────────────────────────────────────────────────────────────
  */
 
 /* ── Light mode (default) ─────────────────────────────────── */
 :root {
-  /* Brand */
-  --color-blue-50:    #EAEAFF;
-  --color-blue-200:   #9EA8FF;
-  --color-blue-400:   #0000FF;
-  --color-blue-600:   #0000CC;
-  --color-blue-800:   #000099;
-  --color-blue-900:   #000066;
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f5f5f3;
+  --bg-tertiary:   #ededea;
 
-  --color-green-50:   #EFFFF0;
-  --color-green-200:  #A8FFAA;
-  --color-green-400:  #47FF47;
-  --color-green-600:  #1ECC1E;
-  --color-green-800:  #148A14;
+  --text-primary:   #1a1a18;
+  --text-secondary: #5a5a57;
+  --text-tertiary:  #999990;
 
-  --color-purple-50:  #F0EEFF;
-  --color-purple-400: #7A6DFF;
-  --color-purple-800: #4C3DCC;
+  --border-default: rgba(0,0,0,.10);
+  --border-medium:  rgba(0,0,0,.18);
+  --border-strong:  rgba(0,0,0,.28);
 
-  --color-teal-50:    #E8FFFA;
-  --color-teal-400:   #24C7A1;
-  --color-teal-800:   #127A63;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.06);
 
-  --color-amber-50:   #FFF4DF;
-  --color-amber-400:  #D9921A;
-  --color-amber-600:  #9C6708;
-  --color-amber-800:  #6E4905;
+  /* Sidebar uses a slightly warm tone in light mode */
+  --sidebar-bg:     #f0efe8;
+  --sidebar-border: rgba(0,0,0,.09);
 
-  --color-red-50:     #FFECEC;
-  --color-red-100:    #FFCFCF;
-  --color-red-400:    #E05252;
-  --color-red-600:    #A72E2E;
-  --color-red-800:    #7A1F1F;
-  --color-red-900:    #521212;
+  /* Input backgrounds */
+  --input-bg:       #ffffff;
+  --input-bg-focus: #ffffff;
 
-  --color-gray-50:    #F4F5F7;
-  --color-gray-100:   #E3E6EA;
-  --color-gray-400:   #8A9099;
-  --color-gray-600:   #5E646D;
-  --color-gray-800:   #2F343A;
-
-  /* Surfaces */
-  --bg-primary:    #FFFFFF;
-  --bg-secondary:  #F5F7FA;
-  --bg-tertiary:   #ECEFF3;
-
-  /* Text */
-  --text-primary:   #000000;
-  --text-secondary: #343A40;
-  --text-tertiary:  #6B7280;
-
-  /* Borders */
-  --border-default: rgba(15, 23, 42, 0.10);
-  --border-medium:  rgba(15, 23, 42, 0.18);
-  --border-strong:  rgba(15, 23, 42, 0.28);
-
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
-  --shadow-lg: 0 10px 28px rgba(0,0,0,.10), 0 4px 10px rgba(0,0,0,.06);
-
-  /* Brand-aware layout */
-  --sidebar-bg:     #F2F5F9;
-  --sidebar-border: rgba(15, 23, 42, .08);
-
-  --input-bg:       #FFFFFF;
-  --input-bg-focus: #FFFFFF;
-
-  --auth-bg:
-    linear-gradient(135deg, #EEF3F8 0%, #F8FAFC 45%, #EDF8ED 100%);
+  /* Auth gate background */
+  --auth-bg: #f0efe8;
 }
 
 /* ── Dark mode ────────────────────────────────────────────── */
 html.dark {
-  /* Brand stays recognizable in dark mode */
-  --color-blue-50:    #0E133A;
-  --color-blue-200:   #5266FF;
-  --color-blue-400:   #4C63FF;
-  --color-blue-600:   #7B8DFF;
-  --color-blue-800:   #B8C3FF;
-  --color-blue-900:   #DDE2FF;
+  --bg-primary:    #1c1c1a;
+  --bg-secondary:  #252523;
+  --bg-tertiary:   #2e2e2b;
 
-  --color-green-50:   #102514;
-  --color-green-200:  #5CFF70;
-  --color-green-400:  #47FF47;
-  --color-green-600:  #87FF87;
-  --color-green-800:  #CCFFD1;
+  --text-primary:   #f0efe8;
+  --text-secondary: #b0b0a8;
+  --text-tertiary:  #737370;
 
-  --color-purple-50:  #241D4A;
-  --color-purple-400: #9388FF;
-  --color-purple-800: #D9D4FF;
-
-  --color-teal-50:    #0C2D27;
-  --color-teal-400:   #39D9B1;
-  --color-teal-800:   #B9FFF0;
-
-  --color-amber-50:   #33230A;
-  --color-amber-400:  #F0AE3D;
-  --color-amber-600:  #FFD27A;
-  --color-amber-800:  #FFE7B6;
-
-  --color-red-50:     #341414;
-  --color-red-100:    #4E1D1D;
-  --color-red-400:    #F06A6A;
-  --color-red-600:    #FF9A9A;
-  --color-red-800:    #FFD0D0;
-  --color-red-900:    #FFE7E7;
-
-  --color-gray-50:    #23262B;
-  --color-gray-100:   #2E3339;
-  --color-gray-400:   #8C939E;
-  --color-gray-600:   #C1C7CF;
-  --color-gray-800:   #E6EAF0;
-
-  /* Industrial dark surfaces */
-  --bg-primary:    #12161B;
-  --bg-secondary:  #191E24;
-  --bg-tertiary:   #0D1116;
-
-  /* Text */
-  --text-primary:   #EDF2F7;
-  --text-secondary: #B6BDC7;
-  --text-tertiary:  #7D8794;
-
-  /* Borders */
   --border-default: rgba(255,255,255,.08);
   --border-medium:  rgba(255,255,255,.14);
   --border-strong:  rgba(255,255,255,.22);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.30), 0 1px 2px rgba(0,0,0,.20);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.42), 0 2px 4px rgba(0,0,0,.28);
-  --shadow-lg: 0 10px 28px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.35);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3),  0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.5), 0 4px 8px rgba(0,0,0,.4);
 
-  --sidebar-bg:     #0C1015;
-  --sidebar-border: rgba(255,255,255,.06);
+  --sidebar-bg:     #212120;
+  --sidebar-border: rgba(255,255,255,.07);
 
-  --input-bg:       #171C22;
-  --input-bg-focus: #1E242C;
+  --input-bg:       #252523;
+  --input-bg-focus: #2e2e2b;
 
-  --auth-bg:
-    radial-gradient(circle at top left, rgba(0,0,255,.12), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(71,255,71,.08), transparent 30%),
-    linear-gradient(135deg, #0B0F14 0%, #10151B 50%, #0D1116 100%);
+  --auth-bg: #1a1a18;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────── */
+/* ── Use sidebar-specific vars ───────────────────────────── */
 .sidebar {
   background: var(--sidebar-bg);
   border-right-color: var(--sidebar-border);
 }
 
-/* ── Auth gate background ────────────────────────────────── */
+/* ── Auth gate background ─────────────────────────────────── */
 #auth-gate {
   background: var(--auth-bg);
 }
 
-/* ── Inputs ──────────────────────────────────────────────── */
+/* ── Input backgrounds ────────────────────────────────────── */
 .auth-input,
 .phone-number-input,
 .phone-country-select,
@@ -175,118 +88,64 @@ html.dark {
 .c-field input,
 .c-field select,
 .c-field textarea,
-.search,
-.comment-textarea {
+.search {
   background: var(--input-bg) !important;
 }
-
 .auth-input:focus,
 .phone-number-input:focus,
-.phone-country-select:focus,
 .otp-digit:focus,
 .field input:focus,
 .field select:focus,
 .field textarea:focus,
 .c-field input:focus,
-.c-field select:focus,
 .c-field textarea:focus,
-.search:focus,
-.comment-textarea:focus {
+.search:focus {
   background: var(--input-bg-focus) !important;
 }
 
-/* ── Stronger brand buttons ──────────────────────────────── */
-.btn-primary,
-.btn-auth {
-  background: linear-gradient(135deg, var(--color-blue-400), var(--color-blue-600));
-  border-color: var(--color-blue-400);
-  color: #fff;
+/* ── Badge / pill dark-mode adjustments ──────────────────── */
+html.dark .pri-low      { background: #27500A; color: #C0DD97; }
+html.dark .pri-medium   { background: #633806; color: #FAC775; }
+html.dark .pri-high     { background: #791F1F; color: #F09595; }
+html.dark .pri-critical { background: #501313; color: #F7C1C1; }
+
+html.dark .status-open     { background: #0C447C; color: #B5D4F4; }
+html.dark .status-progress { background: #633806; color: #FAC775; }
+html.dark .status-resolved { background: #27500A; color: #C0DD97; }
+html.dark .status-closed   { background: #444441; color: #D3D1C7; }
+
+html.dark .type-internal { background: #3C3489; color: #CECBF6; }
+html.dark .type-external { background: #085041; color: #9FE1CB; }
+
+html.dark .badge-blue   { background: #0C447C; color: #B5D4F4; }
+html.dark .badge-purple { background: #3C3489; color: #CECBF6; }
+html.dark .badge-teal   { background: #085041; color: #9FE1CB; }
+
+html.dark .role-pill          { background: #085041; color: #9FE1CB; }
+html.dark .role-pill.employee { background: #3C3489; color: #CECBF6; }
+
+html.dark .dev-banner {
+  background: #2e2e2b;
+  border-color: rgba(255,255,255,.12);
 }
 
-.btn-primary:hover,
-.btn-auth:hover {
-  background: linear-gradient(135deg, var(--color-blue-600), var(--color-blue-800));
+html.dark .stat-card {
+  background: #252523;
+  border-color: rgba(255,255,255,.07);
 }
 
-/* ── Active navigation = green industrial accent ────────── */
-.nav-item.active {
-  border-left-color: var(--color-green-400);
-  background: color-mix(in srgb, var(--color-green-400) 10%, transparent);
+html.dark .ticket-table { background: #1c1c1a; }
+html.dark .ticket-table th { background: #252523; }
+
+html.dark .comment { background: #252523; }
+
+html.dark .customer-cooldown-card {
+  background: #3a2a08;
+  border-color: rgba(186,117,23,.25);
 }
-
-/* Fallback if color-mix is unsupported */
-html.dark .nav-item.active {
-  background: rgba(71, 255, 71, 0.10);
-}
-html:not(.dark) .nav-item.active {
-  background: rgba(71, 255, 71, 0.08);
-}
-
-/* ── Hover tone: blue control-panel feel ─────────────────── */
-.nav-item:hover,
-.ticket-table tbody tr:hover td {
-  background: rgba(0, 0, 255, 0.06);
-}
-html.dark .nav-item:hover,
-html.dark .ticket-table tbody tr:hover td {
-  background: rgba(76, 99, 255, 0.10);
-}
-
-/* ── Badges / pills ──────────────────────────────────────── */
-.badge-blue   { background: rgba(0, 0, 255, .10); color: var(--color-blue-800); }
-.badge-purple { background: rgba(122, 109, 255, .12); color: var(--color-purple-800); }
-.badge-teal   { background: rgba(36, 199, 161, .12); color: var(--color-teal-800); }
-
-.pri-low      { background: rgba(71,255,71,.12);   color: var(--color-green-800); }
-.pri-medium   { background: rgba(217,146,26,.14);  color: var(--color-amber-800); }
-.pri-high     { background: rgba(224,82,82,.14);   color: var(--color-red-800); }
-.pri-critical { background: rgba(224,82,82,.20);   color: var(--color-red-900); }
-
-.status-open     { background: rgba(0,0,255,.12);   color: var(--color-blue-800); }
-.status-progress { background: rgba(217,146,26,.14); color: var(--color-amber-800); }
-.status-resolved { background: rgba(71,255,71,.14);  color: var(--color-green-800); }
-.status-closed   { background: rgba(138,144,153,.14); color: var(--color-gray-800); }
-
-.type-internal { background: rgba(122,109,255,.14); color: var(--color-purple-800); }
-.type-external { background: rgba(36,199,161,.14);  color: var(--color-teal-800); }
-
-/* ── Dark mode tuned badge readability ───────────────────── */
-html.dark .badge-blue   { background: #18205A; color: #C8D0FF; }
-html.dark .badge-purple { background: #2B235A; color: #DDD8FF; }
-html.dark .badge-teal   { background: #10372F; color: #C8FFF3; }
-
-html.dark .pri-low      { background: #17331B; color: #CFFFD3; }
-html.dark .pri-medium   { background: #3A2A10; color: #FFE2A8; }
-html.dark .pri-high     { background: #4A1E1E; color: #FFC7C7; }
-html.dark .pri-critical { background: #5A1818; color: #FFE2E2; }
-
-html.dark .status-open     { background: #18205A; color: #CDD5FF; }
-html.dark .status-progress { background: #3A2A10; color: #FFE2A8; }
-html.dark .status-resolved { background: #17331B; color: #CFFFD3; }
-html.dark .status-closed   { background: #2B3037; color: #D7DEE7; }
-
-html.dark .type-internal { background: #2B235A; color: #DDD8FF; }
-html.dark .type-external { background: #10372F; color: #C8FFF3; }
-
-/* ── Cards / surfaces ────────────────────────────────────── */
-.stat-card,
-.ticket-table,
-.customer-form-card,
-.modal,
-.panel {
-  background: var(--bg-primary);
-}
-
-.ticket-table th,
-.customer-form-header,
-.modal-header,
-.modal-footer,
-.panel-header,
-.panel-footer,
-.topbar,
-.customer-topbar {
-  background: var(--bg-secondary);
-}
+html.dark .customer-form-card { background: #252523; }
+html.dark .customer-form-header { border-color: rgba(255,255,255,.08); }
+html.dark .customer-success-card { background: #17340a; border-color: rgba(99,153,34,.2); }
 
 /* ── Theme toggle button ─────────────────────────────────── */
 .theme-toggle {
@@ -303,30 +162,24 @@ html.dark .type-external { background: #10372F; color: #C8FFF3; }
   transition: background .15s, color .15s, border-color .15s;
   flex-shrink: 0;
 }
-
 .theme-toggle:hover {
   background: var(--bg-secondary);
   color: var(--text-primary);
 }
-
 .theme-toggle .icon-sun  { display: block; }
 .theme-toggle .icon-moon { display: none; }
-
 html.dark .theme-toggle .icon-sun  { display: none; }
 html.dark .theme-toggle .icon-moon { display: block; }
 
-/* ── Smooth theme transitions ────────────────────────────── */
+/* ── Smooth theme transition ─────────────────────────────── */
 *, *::before, *::after {
   transition:
     background-color .2s ease,
-    border-color .2s ease,
-    color .15s ease;
+    border-color     .2s ease,
+    color            .15s ease;
 }
-
-svg *,
-.nav-item,
-.btn,
-.btn-auth,
-.role-card {
-  transition: none;
+/* But not on SVG paths or transform-driven animations */
+svg *, .nav-item, .btn, .btn-auth, .role-card { transition: none; }
+.nav-item, .btn, .btn-auth, .role-card {
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
 }
