@@ -1,27 +1,10 @@
-/**
- * render.js
- * Pure HTML-string builders. No side effects — return strings only.
- * DOM writes happen in app.js, panel.js, and modal.js.
- */
-
-/** Build stat card HTML */
-function renderStatCard(label, value, colorClass) {
-  return `
-    <div class="stat-card">
-      <div class="stat-label">${escapeHtml(label)}</div>
-      <div class="stat-value ${colorClass}">${value}</div>
-    </div>`;
-}
-
-/** Build the dashboard view */
 function renderDashboard() {
-  const s = TicketStore.getSummary();
   return `
-    <div class="stat-grid">
-      ${renderStatCard('Open', s.open, 'blue')}
-      ${renderStatCard('In progress', s.progress, 'amber')}
-      ${renderStatCard('Resolved / closed', s.resolved, 'green')}
-      ${renderStatCard('Critical open', s.critical, 'red')}
+    <div class="stat-grid" id="stat-grid">
+      ${renderStatCard('Open', '—', 'blue')}
+      ${renderStatCard('In progress', '—', 'amber')}
+      ${renderStatCard('Resolved / closed', '—', 'green')}
+      ${renderStatCard('Critical open', '—', 'red')}
     </div>
     <div class="tabs" id="dash-tabs">
       <div class="tab active" data-dash="recent">Recent tickets</div>
@@ -31,7 +14,31 @@ function renderDashboard() {
     <div id="dash-content"></div>`;
 }
 
-/** Build the filter toolbar */
+function renderStatCard(label, value, colorClass) {
+  return `
+    <div class="stat-card">
+      <div class="stat-label">${escapeHtml(label)}</div>
+      <div class="stat-value ${colorClass}" id="stat-${colorClass}">${value}</div>
+    </div>`;
+}
+
+async function populateStats() {
+  try {
+    const s = await TicketStore.getSummary();
+    const map = {
+      blue: s.open_count || s.open || 0,
+      amber: s.progress_count || s.progress || 0,
+      green: s.resolved_count || s.resolved || 0,
+      red: s.critical_count || s.critical || 0,
+    };
+
+    Object.entries(map).forEach(([cls, val]) => {
+      const el = document.getElementById('stat-' + cls);
+      if (el) el.textContent = val;
+    });
+  } catch {}
+}
+
 function renderFilters(includeResolved = false) {
   return `
     <div class="filters">
@@ -43,7 +50,6 @@ function renderFilters(includeResolved = false) {
     </div>`;
 }
 
-/** Build the full ticket table */
 function renderTable(tickets) {
   return `
     <table class="ticket-table">
@@ -65,39 +71,42 @@ function renderTable(tickets) {
     </table>`;
 }
 
-/** Build table rows from a ticket array */
 function renderRows(tickets) {
-  if (!tickets.length) {
+  if (!tickets || !tickets.length) {
     return `<tr class="empty-row"><td colspan="8">No tickets found</td></tr>`;
   }
 
-  return tickets.map((tk, i) => `
-    <tr data-ticket-id="${escapeHtml(tk.id)}">
-      <td><span class="ticket-id">${escapeHtml(tk.id)}</span></td>
-      <td class="subject-cell">
-        <div class="subject-text">${escapeHtml(tk.subject)}</div>
-        <div class="subject-dept">${escapeHtml(tk.dept)}</div>
-      </td>
-      <td><span class="type-badge ${typeClass(tk.type)}">${tk.type === 'internal' ? 'Internal' : 'External'}</span></td>
-      <td><span class="pri-badge ${priorityClass(tk.priority)}">${escapeHtml(tk.priority)}</span></td>
-      <td><span class="status-badge ${statusClass(tk.status)}">${escapeHtml(tk.status)}</span></td>
-      <td>
-        <div class="requester-cell">
-          <div class="avatar ${avatarClass(i)}">${getInitials(tk.requester)}</div>
-          <span>${escapeHtml(tk.requester)}</span>
-        </div>
-      </td>
-      <td style="font-size:12px;color:var(--text-secondary);">${escapeHtml(tk.assignee)}</td>
-      <td style="font-size:12px;color:var(--text-tertiary);">${escapeHtml(tk.updated)}</td>
-    </tr>`).join('');
+  return tickets.map((tk, i) => {
+    const displayId = tk.id || tk.ticket_no || '';
+    const updated = (tk.updated || tk.updated_at || '').slice(0, 10);
+
+    return `
+      <tr data-ticket-id="${escapeHtml(displayId)}">
+        <td><span class="ticket-id">${escapeHtml(displayId)}</span></td>
+        <td class="subject-cell">
+          <div class="subject-text">${escapeHtml(tk.subject)}</div>
+          <div class="subject-dept">${escapeHtml(tk.dept || '')}</div>
+        </td>
+        <td><span class="type-badge ${typeClass(tk.type)}">${tk.type === 'internal' ? 'Internal' : 'External'}</span></td>
+        <td><span class="pri-badge ${priorityClass(tk.priority)}">${escapeHtml(tk.priority)}</span></td>
+        <td><span class="status-badge ${statusClass(tk.status)}">${escapeHtml(tk.status)}</span></td>
+        <td>
+          <div class="requester-cell">
+            <div class="avatar ${avatarClass(i)}">${getInitials(tk.requester || '?')}</div>
+            <span>${escapeHtml(tk.requester || '')}</span>
+          </div>
+        </td>
+        <td style="font-size:12px;color:var(--text-secondary);">${escapeHtml(tk.assignee || 'Unassigned')}</td>
+        <td style="font-size:12px;color:var(--text-tertiary);">${escapeHtml(updated)}</td>
+      </tr>`;
+  }).join('');
 }
 
-/** Build the ticket detail panel body */
 function renderPanelBody(tk) {
-  const comments = tk.comments.map(c => `
+  const comments = (tk.comments || []).map(c => `
     <div class="comment">
-      <div class="comment-meta">${escapeHtml(c.author)} · ${escapeHtml(c.time)}</div>
-      ${escapeHtml(c.text)}
+      <div class="comment-meta">${escapeHtml(c.author)} · ${escapeHtml(c.time || '')}</div>
+      ${escapeHtml(c.text || c.body || '')}
     </div>`).join('');
 
   const statusBtns = ['open', 'progress', 'resolved', 'closed'].map(s => `
@@ -108,9 +117,7 @@ function renderPanelBody(tk) {
     <div class="detail-badges">
       <span class="status-badge ${statusClass(tk.status)}">${escapeHtml(tk.status)}</span>
       <span class="pri-badge ${priorityClass(tk.priority)}">${escapeHtml(tk.priority)} priority</span>
-      <span class="type-badge ${typeClass(tk.type)}">${tk.type}</span>
-      ${tk.favorite ? '<span class="badge badge-teal">Favorite</span>' : ''}
-      ${tk.archived ? '<span class="badge badge-purple">Archived</span>' : ''}
+      <span class="type-badge ${typeClass(tk.type)}">${escapeHtml(tk.type)}</span>
     </div>
 
     <div class="detail-subject">${escapeHtml(tk.subject)}</div>
@@ -118,19 +125,19 @@ function renderPanelBody(tk) {
     <div class="detail-meta-grid">
       <div class="meta-item">
         <div class="meta-label">Requester</div>
-        <div class="meta-value">${escapeHtml(tk.requester)}</div>
+        <div class="meta-value">${escapeHtml(tk.requester || '')}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Assignee</div>
-        <div class="meta-value">${escapeHtml(tk.assignee)}</div>
+        <div class="meta-value">${escapeHtml(tk.assignee || 'Unassigned')}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Department</div>
-        <div class="meta-value">${escapeHtml(tk.dept)}</div>
+        <div class="meta-value">${escapeHtml(tk.dept || '')}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Created</div>
-        <div class="meta-value">${escapeHtml(tk.created)}</div>
+        <div class="meta-value">${escapeHtml(tk.created || '')}</div>
       </div>
     </div>
 
@@ -141,16 +148,6 @@ function renderPanelBody(tk) {
       </div>
     </div>
 
-    <div class="status-controls">
-      <div class="status-controls-label">Ticket actions</div>
-      <div class="status-btns" id="ticket-action-group">
-        <button class="filter-btn" data-action="favorite">${tk.favorite ? 'Unfavorite' : 'Favorite'}</button>
-        <button class="filter-btn" data-action="archive">${tk.archived ? 'Unarchive' : 'Archive'}</button>
-        <button class="filter-btn" data-action="edit">Edit</button>
-        <button class="filter-btn" data-action="delete">Delete</button>
-      </div>
-    </div>
-
     <div class="activity-section">
       <div class="activity-heading">Activity</div>
       <div id="comment-list">${comments || '<div style="font-size:13px;color:var(--text-tertiary);">No comments yet.</div>'}</div>
@@ -158,7 +155,6 @@ function renderPanelBody(tk) {
     </div>`;
 }
 
-/** Build the new-ticket modal body */
 function renderModalBody() {
   return `
     <div class="type-selector">
@@ -209,6 +205,17 @@ function renderModalBody() {
           <option value="high">High</option>
           <option value="critical">Critical</option>
         </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Assignee</label>
+        <input type="text" id="new-assignee" placeholder="Unassigned" />
+      </div>
+      <div class="field">
+        <label>Customer email</label>
+        <input type="email" id="new-email" placeholder="optional@email.com" />
       </div>
     </div>
 

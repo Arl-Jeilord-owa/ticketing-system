@@ -1,13 +1,10 @@
-/**
- * data.js
- * Central data store: ticket array and CRUD helpers.
- * No DOM manipulation here — pure data logic.
- */
-
 const TicketStore = (() => {
-  let tickets = [
+  let _offlineMode = false;
+
+  let _mockTickets = [
     {
-      id: 'TK-001',
+      id: 'TK-0001',
+      ticket_no: 'TK-0001',
       type: 'internal',
       dept: 'IT',
       subject: 'VPN not connecting from home office',
@@ -15,157 +12,216 @@ const TicketStore = (() => {
       status: 'open',
       requester: 'Maria Santos',
       assignee: 'IT Support',
-      created: '2026-04-10',
-      updated: '2026-04-13',
-      archived: false,
-      favorite: false,
-      comments: [
-        { author: 'IT Support', time: 'Apr 11', text: 'We are looking into the VPN gateway issue. Please try restarting your device first.' }
-      ]
+      created_at: '2026-04-10',
+      updated_at: '2026-04-13',
+      comments: []
     },
     {
-      id: 'TK-002',
-      type: 'external',
-      dept: 'Billing',
-      subject: 'Invoice #4821 shows wrong billing amount',
+      id: 'TK-0002',
+      ticket_no: 'TK-0002',
+      type: 'internal',
+      dept: 'HR',
+      subject: 'Cannot access payslip portal — login loop',
       priority: 'medium',
       status: 'progress',
-      requester: 'James Lim',
-      assignee: 'Billing Team',
-      created: '2026-04-11',
-      updated: '2026-04-13',
-      archived: false,
-      favorite: true,
-      comments: [
-        { author: 'Billing Team', time: 'Apr 12', text: 'We have located the discrepancy and are processing a corrected invoice.' }
-      ]
+      requester: 'Carlos Reyes',
+      assignee: 'HR Systems',
+      created_at: '2026-04-11',
+      updated_at: '2026-04-13',
+      comments: []
     }
   ];
 
-  let idCounter = 3;
+  let _mockIdCounter = 3;
 
-  function today() {
-    return new Date().toISOString().slice(0, 10);
+  function normalise(t) {
+    return {
+      ...t,
+      id: t.ticket_no || t.id,
+      created: (t.created_at || t.created || '').slice(0, 10),
+      updated: (t.updated_at || t.updated || '').slice(0, 10),
+    };
+  }
+
+  async function apiFetch(path, options = {}) {
+    const res = await fetch(path, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      },
+      ...options,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw Object.assign(new Error(err.error || 'API error'), { status: res.status });
+    }
+
+    return res.json();
+  }
+
+  function mockFilter({ view, statusFilter, query }) {
+    return _mockTickets.filter(t => {
+      if (view === 'internal' && (t.type !== 'internal' || t.status === 'closed')) return false;
+      if (view === 'resolved' && t.status !== 'resolved' && t.status !== 'closed') return false;
+      if (view === 'all' && (t.status === 'resolved' || t.status === 'closed')) return false;
+      if (statusFilter && statusFilter !== 'all' && t.status !== statusFilter) return false;
+
+      if (query) {
+        const q = query.toLowerCase();
+        if (
+          !t.id.toLowerCase().includes(q) &&
+          !t.subject.toLowerCase().includes(q) &&
+          !t.requester.toLowerCase().includes(q) &&
+          !(t.dept || '').toLowerCase().includes(q)
+        ) return false;
+      }
+
+      return true;
+    }).map(normalise);
   }
 
   return {
-    getAll() {
-      return [...tickets];
+    isOffline() {
+      return _offlineMode;
     },
 
-    getById(id) {
-      return tickets.find(t => t.id === id) || null;
+    async filter({ view = 'all', statusFilter = 'all', query = '' } = {}) {
+      if (_offlineMode) return mockFilter({ view, statusFilter, query });
+
+      try {
+        const params = new URLSearchParams();
+        if (view) params.set('view', view);
+        if (statusFilter && statusFilter !== 'all') params.set('status', statusFilter);
+        if (query) params.set('q', query);
+
+        const data = await apiFetch('/api/tickets?' + params.toString());
+        return (data.tickets || []).map(normalise);
+      } catch (err) {
+        if (err.status === 401) throw err;
+        _offlineMode = true;
+        return mockFilter({ view, statusFilter, query });
+      }
     },
 
-    create({ type, dept, subject, priority, requester, assignee = 'Unassigned', description = '', email = '', phone = '' }) {
-      const id = 'TK-' + String(idCounter++).padStart(3, '0');
-      const ticket = {
-        id,
-        type,
-        dept,
-        subject,
-        priority,
-        status: 'open',
-        requester,
-        assignee,
-        created: today(),
-        updated: today(),
-        description,
-        email,
-        phone,
-        archived: false,
-        favorite: false,
-        comments: []
-      };
-      tickets.unshift(ticket);
-      return ticket;
+    async getAll() {
+      if (_offlineMode) return _mockTickets.map(normalise);
+
+      try {
+        const data = await apiFetch('/api/tickets');
+        return (data.tickets || []).map(normalise);
+      } catch {
+        _offlineMode = true;
+        return _mockTickets.map(normalise);
+      }
     },
 
-    update(id, updates) {
-      const t = tickets.find(tk => tk.id === id);
-      if (!t) return null;
-      Object.assign(t, updates);
-      t.updated = today();
-      return t;
+    async getSummary() {
+      if (_offlineMode) {
+        return {
+          open: _mockTickets.filter(t => t.status === 'open').length,
+          progress: _mockTickets.filter(t => t.status === 'progress').length,
+          resolved: _mockTickets.filter(t => ['resolved', 'closed'].includes(t.status)).length,
+          critical: _mockTickets.filter(t => t.priority === 'critical' && t.status === 'open').length,
+        };
+      }
+
+      try {
+        return await apiFetch('/api/tickets/summary');
+      } catch {
+        _offlineMode = true;
+        return {
+          open: 0,
+          progress: 0,
+          resolved: 0,
+          critical: 0,
+        };
+      }
     },
 
-    setStatus(id, status) {
-      const t = tickets.find(tk => tk.id === id);
-      if (!t) return null;
-      t.status = status;
-      t.updated = today();
-      return t;
+    async getById(ticketNo) {
+      if (_offlineMode) {
+        const t = _mockTickets.find(t => t.id === ticketNo || t.ticket_no === ticketNo);
+        return t ? { ticket: normalise(t), comments: t.comments || [] } : null;
+      }
+
+      try {
+        const data = await apiFetch('/api/tickets/by-no/' + encodeURIComponent(ticketNo));
+        return {
+          ticket: normalise(data.ticket),
+          comments: (data.comments || []).map(c => ({
+            ...c,
+            time: new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            text: c.body,
+          })),
+        };
+      } catch {
+        return null;
+      }
     },
 
-    toggleFavorite(id) {
-      const t = tickets.find(tk => tk.id === id);
-      if (!t) return null;
-      t.favorite = !t.favorite;
-      t.updated = today();
-      return t;
-    },
+    async create(payload) {
+      if (_offlineMode) {
+        const ticketNo = 'TK-' + String(_mockIdCounter++).padStart(4, '0');
+        _mockTickets.unshift({
+          id: ticketNo,
+          ticket_no: ticketNo,
+          type: 'internal',
+          dept: payload.dept || 'IT',
+          subject: payload.subject,
+          priority: payload.priority || 'medium',
+          status: 'open',
+          requester: payload.requester,
+          assignee: payload.assignee || 'Unassigned',
+          description: payload.description || '',
+          created_at: new Date().toISOString().slice(0, 10),
+          updated_at: new Date().toISOString().slice(0, 10),
+          comments: []
+        });
+        return { ticketNo };
+      }
 
-    toggleArchive(id) {
-      const t = tickets.find(tk => tk.id === id);
-      if (!t) return null;
-      t.archived = !t.archived;
-      t.updated = today();
-      return t;
-    },
-
-    remove(id) {
-      const index = tickets.findIndex(tk => tk.id === id);
-      if (index === -1) return false;
-      tickets.splice(index, 1);
-      return true;
-    },
-
-    addComment(id, { author, text }) {
-      const t = tickets.find(tk => tk.id === id);
-      if (!t) return null;
-      const comment = { author, time: formatDate(new Date()), text };
-      t.comments.push(comment);
-      t.updated = today();
-      return comment;
-    },
-
-    filter({ view = 'all', statusFilter = 'all', query = '' }) {
-      return tickets.filter(t => {
-        if (t.archived && view !== 'archived') return false;
-        if (view === 'archived' && !t.archived) return false;
-        if (view === 'favorites' && !t.favorite) return false;
-        if (view === 'internal' && (t.type !== 'internal' || t.status === 'closed')) return false;
-        if (view === 'external' && (t.type !== 'external' || t.status === 'closed')) return false;
-        if (view === 'resolved' && t.status !== 'resolved' && t.status !== 'closed') return false;
-        if (view === 'all' && (t.status === 'resolved' || t.status === 'closed')) return false;
-
-        if (statusFilter !== 'all' && t.status !== statusFilter) return false;
-
-        if (query) {
-          const q = query.toLowerCase();
-          if (
-            !t.id.toLowerCase().includes(q) &&
-            !t.subject.toLowerCase().includes(q) &&
-            !t.requester.toLowerCase().includes(q) &&
-            !t.dept.toLowerCase().includes(q)
-          ) return false;
-        }
-
-        return true;
+      return apiFetch('/api/tickets', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...payload,
+          type: 'internal'
+        }),
       });
     },
 
-    getSummary() {
-      return {
-        open: tickets.filter(t => t.status === 'open' && !t.archived).length,
-        progress: tickets.filter(t => t.status === 'progress' && !t.archived).length,
-        resolved: tickets.filter(t => (t.status === 'resolved' || t.status === 'closed') && !t.archived).length,
-        critical: tickets.filter(t => t.priority === 'critical' && t.status === 'open' && !t.archived).length,
-      };
-    }
+    async setStatus(ticketNo, status) {
+      if (_offlineMode) {
+        const t = _mockTickets.find(t => t.ticket_no === ticketNo || t.id === ticketNo);
+        if (t) t.status = status;
+        return { success: true };
+      }
+
+      return apiFetch('/api/tickets/' + encodeURIComponent(ticketNo) + '/status', {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+    },
+
+    async addComment(ticketNo, body) {
+      if (_offlineMode) {
+        const t = _mockTickets.find(t => t.ticket_no === ticketNo || t.id === ticketNo);
+        if (t) {
+          t.comments = t.comments || [];
+          t.comments.push({
+            author: 'Agent',
+            text: body,
+            time: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          });
+        }
+        return { success: true };
+      }
+
+      return apiFetch('/api/tickets/' + encodeURIComponent(ticketNo) + '/comments', {
+        method: 'POST',
+        body: JSON.stringify({ body }),
+      });
+    },
   };
 })();
-
-function formatDate(date) {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}

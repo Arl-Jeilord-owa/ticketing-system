@@ -1,45 +1,55 @@
 require('dotenv').config();
+
 const express = require('express');
 const session = require('express-session');
-const cors = require('cors');
-const path = require('path');
+const cors    = require('cors');
+const path    = require('path');
 
-const authRoutes = require('./routes/auth');
-const ticketRoutes = require('./routes/tickets');
-
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: true, credentials: true }));
+// ── Middleware ─────────────────────────────────────
+app.use(cors({
+  origin:      true,
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret',
-  resave: false,
+  secret:            process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  resave:            false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure:   process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 8 * 60 * 60 * 1000,
+    maxAge:   8 * 60 * 60 * 1000, // 8 hours
   },
 }));
 
+// ── Static files ───────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/tickets', ticketRoutes);
+// ── API Routes ─────────────────────────────────────
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/employees', require('./routes/employees'));
+app.use('/api/mail', require('./routes/mail'));
 
-// health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK' });
+// ── Health check ───────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// fallback
-app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ── Catch-all: serve index.html for frontend routes ─
+app.use((req, res) => {
+  if (!req.path.startsWith('/api')) {
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+  return res.status(404).json({ error: 'API route not found.' });
 });
 
+// ── Start ──────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`OMTPI HelpDesk running at http://omtpi.helpdesk.local:${PORT}`);
 });

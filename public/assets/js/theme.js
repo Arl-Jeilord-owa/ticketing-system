@@ -1,15 +1,3 @@
-/**
- * theme.js
- * Light / dark mode toggle.
- * Reads from localStorage on page load.
- * Toggled by clicking #theme-toggle anywhere in the page.
- *
- * Usage:
- *   - Include this script in <head> (before body) so the theme
- *     is applied before first paint (prevents flash of wrong theme).
- *   - The toggle button (#theme-toggle) can be anywhere in the HTML.
- */
-
 (function () {
   const STORAGE_KEY = 'omtpi-theme';
 
@@ -33,11 +21,8 @@
   applyTheme(getSavedTheme());
 
   document.addEventListener('DOMContentLoaded', () => {
-    const employeeBtn = document.getElementById('theme-toggle');
-    const customerBtn = document.getElementById('theme-toggle-customer');
-
-    if (employeeBtn) employeeBtn.addEventListener('click', toggleTheme);
-    if (customerBtn) customerBtn.addEventListener('click', toggleTheme);
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.addEventListener('click', toggleTheme);
   });
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');

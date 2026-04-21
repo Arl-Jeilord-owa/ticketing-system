@@ -1,0 +1,46 @@
+> ticketing-system
+- .env
+- .gitattributes
+- gitignore
+- db.js
+- mailer.js
+- package.json
+- package-lock.json
+- seeds.js
+- server.js
+- setup.sql
+ > node_modules
+ > public 
+     > assets
+      - index.html   
+        > css 
+           - auth.css
+           - badges.css
+           - components.css
+           - customer.css
+           - dashboard.css
+           - layout.css
+           - modal.css
+           - panel.css
+           - reset.css
+           - sidebar.css
+           - table.css
+           - theme.css
+           - topbar.css
+           - variables.css
+        > images
+           - LOGO_omtpi - Copy.png
+           - LOGO_omtpi.png
+        > js
+           - app.js
+           - auth.js
+           - customer.js
+           - data.js
+           - modal.js
+           - panel.js
+           - render.js
+           - theme.js
+           - utils.js
+  > routes 
+     - auth.js 
+     - employees.js

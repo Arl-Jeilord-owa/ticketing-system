@@ -1,119 +1,100 @@
 const Panel = (() => {
-  let currentTicketId = null;
+  let currentTicketNo = null;
 
-  function open(ticketId) {
-    const tk = TicketStore.getById(ticketId);
-    if (!tk) return;
-    currentTicketId = ticketId;
-    renderCurrent();
-    $('detail-panel').classList.add('open');
+  async function open(ticketNo) {
+    currentTicketNo = ticketNo;
+    const panelEl = $('detail-panel');
+    if (!panelEl) return;
+
+    $('panel-title').textContent = ticketNo + ' · Loading…';
+    $('panel-body').innerHTML = `<div class="loading-row"><div class="loading-spinner"></div></div>`;
+    $('panel-footer').innerHTML = '';
+    panelEl.classList.add('open');
+
+    try {
+      const result = await TicketStore.getById(ticketNo);
+      if (!result) {
+        $('panel-body').innerHTML = `<p style="color:var(--text-tertiary);padding:12px;">Ticket not found.</p>`;
+        return;
+      }
+
+      const { ticket: tk, comments } = result;
+
+      $('panel-title').textContent =
+        tk.id + ' · ' + (tk.subject.length > 38 ? tk.subject.slice(0, 38) + '…' : tk.subject);
+
+      $('panel-body').innerHTML = renderPanelBody({ ...tk, comments });
+
+      $('panel-footer').innerHTML = `
+        <button class="btn" id="panel-cancel-btn">Close</button>
+        <button class="btn btn-primary" id="panel-comment-btn">Add comment</button>`;
+
+      bindStatusButtons();
+      bindCommentButton();
+      $('panel-cancel-btn')?.addEventListener('click', close);
+
+    } catch (err) {
+      $('panel-body').innerHTML = `<p style="color:var(--color-red-600);padding:12px;">Failed to load ticket.</p>`;
+      console.error('[Panel.open]', err);
+    }
   }
 
-  function renderCurrent() {
-    const tk = TicketStore.getById(currentTicketId);
-    if (!tk) {
-      close();
-      return;
-    }
+  function bindStatusButtons() {
+    const group = $('status-btn-group');
+    if (!group) return;
 
-    $('panel-title').textContent =
-      tk.id + ' · ' + (tk.subject.length > 35 ? tk.subject.slice(0, 35) + '…' : tk.subject);
+    group.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-status]');
+      if (!btn) return;
 
-    $('panel-body').innerHTML = renderPanelBody(tk);
-    $('panel-footer').innerHTML = `
-      <button class="btn" id="panel-cancel-btn">Close</button>
-      <button class="btn btn-primary" id="panel-comment-btn">Add comment</button>`;
+      const newStatus = btn.dataset.status;
+      btn.disabled = true;
 
-    const statusGroup = $('status-btn-group');
-    if (statusGroup) {
-      statusGroup.addEventListener('click', e => {
-        const btn = e.target.closest('[data-status]');
-        if (!btn) return;
-        TicketStore.setStatus(currentTicketId, btn.dataset.status);
-        renderCurrent();
-        App.refreshContent();
-        showToast('Status updated');
-      });
-    }
-
-    const actions = $('ticket-action-group');
-    if (actions) {
-      actions.addEventListener('click', e => {
-        const btn = e.target.closest('[data-action]');
-        if (!btn) return;
-
-        const action = btn.dataset.action;
-
-        if (action === 'favorite') {
-          TicketStore.toggleFavorite(currentTicketId);
-          renderCurrent();
-          App.refreshContent();
-          showToast('Favorite updated');
-          return;
-        }
-
-        if (action === 'archive') {
-          TicketStore.toggleArchive(currentTicketId);
-          renderCurrent();
-          App.refreshContent();
-          showToast('Archive updated');
-          return;
-        }
-
-        if (action === 'edit') {
-          const tk = TicketStore.getById(currentTicketId);
-          const subject = prompt('Edit subject:', tk.subject);
-          if (subject === null) return;
-
-          const description = prompt('Edit description:', tk.description || '');
-          if (description === null) return;
-
-          TicketStore.update(currentTicketId, {
-            subject: subject.trim() || tk.subject,
-            description: description.trim()
-          });
-
-          renderCurrent();
-          App.refreshContent();
-          showToast('Ticket updated');
-          return;
-        }
-
-        if (action === 'delete') {
-          if (!confirm('Delete this ticket permanently?')) return;
-          TicketStore.remove(currentTicketId);
-          close();
-          App.refreshContent();
-          showToast('Ticket deleted');
-        }
-      });
-    }
-
-    $('panel-cancel-btn')?.addEventListener('click', close);
-    $('panel-comment-btn')?.addEventListener('click', submitComment);
+      try {
+        await TicketStore.setStatus(currentTicketNo, newStatus);
+        await open(currentTicketNo);
+        await App.refreshContent();
+        showToast('Status updated to "' + newStatus + '"');
+      } catch (err) {
+        btn.disabled = false;
+        showToast('Could not update status.');
+        console.error('[Panel.status]', err);
+      }
+    });
   }
 
-  function submitComment() {
-    const textarea = $('new-comment');
-    const text = textarea ? textarea.value.trim() : '';
-    if (!text) {
-      showToast('Please write a comment first.');
-      return;
-    }
+  function bindCommentButton() {
+    const btn = $('panel-comment-btn');
+    if (!btn) return;
 
-    TicketStore.addComment(currentTicketId, { author: 'Agent', text });
-    renderCurrent();
-    App.refreshContent();
-    showToast('Comment added');
+    btn.addEventListener('click', async () => {
+      const textarea = $('new-comment');
+      const text = textarea ? textarea.value.trim() : '';
+
+      if (!text) {
+        showToast('Please write a comment first.');
+        return;
+      }
+
+      try {
+        await TicketStore.addComment(currentTicketNo, text);
+        await open(currentTicketNo);
+        await App.refreshContent();
+        showToast('Comment added');
+      } catch (err) {
+        showToast('Could not add comment.');
+        console.error('[Panel.comment]', err);
+      }
+    });
   }
 
   function close() {
     $('detail-panel').classList.remove('open');
-    currentTicketId = null;
+    currentTicketNo = null;
   }
 
   function getCurrent() {
-    return currentTicketId;
+    return currentTicketNo;
   }
 
   return { open, close, getCurrent };

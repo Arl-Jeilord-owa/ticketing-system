@@ -1,8 +1,3 @@
-/**
- * modal.js
- * New-ticket modal: open, close, type selection, form submission.
- */
-
 const Modal = (() => {
   let selectedType = 'internal';
 
@@ -14,7 +9,7 @@ const Modal = (() => {
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
           <div class="modal-header">
             <span class="modal-header-title" id="modal-heading">Create new ticket</span>
-            <button class="btn btn-sm" id="modal-close-btn" aria-label="Close">✕</button>
+            <button class="btn btn-sm" id="modal-close-btn" aria-label="Close">&times;</button>
           </div>
           <div class="modal-body">
             ${renderModalBody()}
@@ -26,19 +21,16 @@ const Modal = (() => {
         </div>
       </div>`;
 
-    // Close on overlay click
     $('modal-overlay').addEventListener('click', e => {
       if (e.target === $('modal-overlay')) close();
     });
 
-    // Close/cancel buttons
     $('modal-close-btn').addEventListener('click', close);
     $('modal-cancel-btn').addEventListener('click', close);
-
-    // Submit
     $('modal-submit-btn').addEventListener('click', submit);
 
-    // Type selection
+    document.addEventListener('keydown', handleEsc);
+
     qsa('[data-type]', $('modal-container')).forEach(btn => {
       btn.addEventListener('click', () => {
         selectedType = btn.dataset.type;
@@ -48,52 +40,66 @@ const Modal = (() => {
       });
     });
 
-    // Focus first input
-    setTimeout(() => {
-      const first = $('new-subject');
-      if (first) first.focus();
-    }, 50);
+    setTimeout(() => $('new-subject')?.focus(), 60);
   }
 
-  function submit() {
-    const subject = $('new-subject') ? $('new-subject').value.trim() : '';
-    const requester = $('new-requester') ? $('new-requester').value.trim() : '';
+  function handleEsc(e) {
+    if (e.key === 'Escape') close();
+  }
 
-    if (!subject || !requester) {
-      showToast('Subject and requester name are required.');
+  async function submit() {
+    const subject = ($('new-subject')?.value || '').trim();
+    const requester = ($('new-requester')?.value || '').trim();
+    const dept = $('new-dept')?.value || 'IT';
+    const priority = $('new-priority')?.value || 'medium';
+    const assignee = ($('new-assignee')?.value || '').trim();
+    const email = ($('new-email')?.value || '').trim();
+    const desc = ($('new-desc')?.value || '').trim();
+
+    if (!subject) {
+      showToast('Subject is required.');
+      return;
+    }
+    if (!requester) {
+      showToast('Requester name is required.');
       return;
     }
 
-    const ticket = fetch('/api/tickets', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name,
-        email,
+    const submitBtn = $('modal-submit-btn');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating…';
+    }
+
+    try {
+      const result = await TicketStore.create({
+        type: selectedType,
+        dept,
         subject,
-        category: cat,
         priority,
+        requester,
+        assignee: assignee || 'Unassigned',
         description: desc,
-        phone: session.phone
-      })
-    })
-      .then(res => res.json())
-      .then(ticket => {
-        renderSuccess($('customer-content'), ticket, name);
-      })
-      .catch(() => {
-        alert('Failed to submit ticket');
+        email: email || null,
       });
 
-    close();
-    App.navigateTo('all');
-    showToast('Ticket ' + ticket.id + ' created');
+      close();
+      App.navigateTo('all');
+      setTimeout(() => App.refreshContent(), 50);
+      showToast('Ticket ' + result.ticketNo + ' created');
+    } catch (err) {
+      console.error('[Modal.submit]', err);
+      showToast(err.message || 'Could not create ticket.');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create ticket';
+      }
+    }
   }
 
   function close() {
     $('modal-container').innerHTML = '';
+    document.removeEventListener('keydown', handleEsc);
   }
 
   return { open, close };

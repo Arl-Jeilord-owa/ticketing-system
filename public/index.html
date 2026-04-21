@@ -5,16 +5,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HelpDesk — OMTPI Support</title>
+
+  <script src="/assets/js/theme.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet">
+
   <link rel="stylesheet" href="/assets/css/reset.css" />
   <link rel="stylesheet" href="/assets/css/variables.css" />
   <link rel="stylesheet" href="/assets/css/theme.css" />
-  <link rel="stylesheet" href="/assets/css/auth.css" />
   <link rel="stylesheet" href="/assets/css/layout.css" />
+  <link rel="stylesheet" href="/assets/css/auth.css" />
   <link rel="stylesheet" href="/assets/css/sidebar.css" />
   <link rel="stylesheet" href="/assets/css/topbar.css" />
   <link rel="stylesheet" href="/assets/css/dashboard.css" />
@@ -23,16 +27,204 @@
   <link rel="stylesheet" href="/assets/css/modal.css" />
   <link rel="stylesheet" href="/assets/css/badges.css" />
   <link rel="stylesheet" href="/assets/css/components.css" />
-  <link rel="stylesheet" href="/assets/css/customer.css" />
+
+  <style>
+    /* ── Employees view ── */
+    .emp-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .emp-search {
+      width: 240px;
+      padding: 7px 12px;
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .emp-search:focus {
+      border-color: var(--color-blue-400);
+      box-shadow: 0 0 0 3px rgba(55, 138, 221, .12);
+    }
+
+    .emp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border-default);
+      overflow: hidden;
+    }
+
+    .emp-table th {
+      text-align: left;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      padding: 8px 14px;
+      background: var(--bg-secondary);
+      border-bottom: 0.5px solid var(--border-default);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .emp-table td {
+      padding: 10px 14px;
+      font-size: 13px;
+      border-bottom: 0.5px solid var(--border-default);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .emp-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .emp-table tbody tr {
+      transition: background var(--transition-fast);
+    }
+
+    .emp-table tbody tr:hover td {
+      background: var(--bg-secondary);
+    }
+
+    .emp-role-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .emp-role-admin {
+      background: var(--color-blue-50);
+      color: var(--color-blue-800);
+    }
+
+    .emp-role-agent {
+      background: var(--color-purple-50);
+      color: var(--color-purple-800);
+    }
+
+    .emp-role-viewer {
+      background: var(--color-gray-50);
+      color: var(--color-gray-800);
+    }
+
+    .emp-status-active {
+      color: var(--color-green-600);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .emp-status-inactive {
+      color: var(--color-red-400);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .emp-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ── Modal form ── */
+    .modal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+
+    .modal-form-grid .span-2 {
+      grid-column: 1 / -1;
+    }
+
+    .mfield {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .mfield label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .mfield input,
+    .mfield select {
+      padding: 9px 11px;
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .mfield input:focus,
+    .mfield select:focus {
+      border-color: var(--color-blue-400);
+      box-shadow: 0 0 0 3px rgba(55, 138, 221, .12);
+    }
+
+    .modal-error {
+      background: var(--color-red-50);
+      color: var(--color-red-600);
+      border: 0.5px solid rgba(226, 75, 74, .2);
+      border-radius: var(--radius-md);
+      padding: 9px 13px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Admin-only elements hidden by default ── */
+    .admin-only {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- AUTH GATE -->
+  <!-- ═══════════════════ AUTH GATE ═══════════════════ -->
   <div id="auth-gate">
-
-    <!-- Screen 1: Role picker -->
-    <div id="screen-landing" class="auth-screen active">
+    <div id="screen-employee-login" class="auth-screen active">
       <div class="auth-card">
         <div class="auth-logo">
           <div class="auth-logo-mark">
@@ -40,114 +232,24 @@
           </div>
           <div>
             <div class="auth-logo-name">OMTPI HelpDesk</div>
-            <div class="auth-logo-tagline">Industrial Support and Maintenance Ticket System</div>
+            <div class="auth-logo-tagline">Operations and Maintenance Portal</div>
           </div>
         </div>
-        <h1 class="auth-heading">Who are you?</h1>
-        <p class="auth-subheading">Choose how you're accessing support today.</p>
-        <div class="role-grid">
-          <button class="role-card" id="btn-role-customer">
-            <div class="role-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </div>
-            <div class="role-label">Customer / Client</div>
-            <div class="role-desc">Submit a support ticket for products or services</div>
-            <div class="role-pill">OTP via phone</div>
-          </button>
-          <button class="role-card" id="btn-role-employee">
-            <div class="role-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="2" y="7" width="20" height="14" rx="2" />
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-                <line x1="12" y1="12" x2="12" y2="16" />
-                <line x1="10" y1="14" x2="14" y2="14" />
-              </svg>
-            </div>
-            <div class="role-label">Employee</div>
-            <div class="role-desc">Manage, view, and resolve internal or external tickets</div>
-            <div class="role-pill employee">@omtpi.com.ph email</div>
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Screen 2: Customer phone entry -->
-    <div id="screen-customer-phone" class="auth-screen">
-      <div class="auth-card">
-        <button class="auth-back" id="back-from-phone">&#8592; Back</button>
-        <div class="auth-step-label">Customer verification &middot; Step 1 of 2</div>
-        <h1 class="auth-heading">Enter your phone number</h1>
-        <p class="auth-subheading">We'll send a one-time password via SMS. Philippines and Japan numbers only.</p>
-        <div class="phone-input-group">
-          <select id="phone-country" class="phone-country-select">
-            <option value="+63">&#127477;&#127469; +63</option>
-            <option value="+81">&#127471;&#127477; +81</option>
-          </select>
-          <input type="tel" id="phone-number" class="phone-number-input" placeholder="9171234567" maxlength="12"
-            autocomplete="tel" />
-        </div>
-        <div class="field-hint">PH: enter without leading zero &nbsp;|&nbsp; JP: include area code</div>
-        <div class="auth-error hidden" id="phone-error"></div>
-        <div class="cooldown-banner hidden" id="cooldown-banner">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15">
-            <path fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-              clip-rule="evenodd" />
-          </svg>
-          <span id="cooldown-text">Please wait before submitting another ticket.</span>
-        </div>
-        <button class="btn-auth" id="btn-send-otp">Send OTP</button>
-      </div>
-    </div>
-
-    <!-- Screen 3: OTP entry -->
-    <div id="screen-customer-otp" class="auth-screen">
-      <div class="auth-card">
-        <button class="auth-back" id="back-from-otp">&#8592; Back</button>
-        <div class="auth-step-label">Customer verification &middot; Step 2 of 2</div>
-        <h1 class="auth-heading">Enter the OTP</h1>
-        <p class="auth-subheading" id="otp-sent-to">Sent to your number.</p>
-        <div class="otp-input-group" id="otp-inputs">
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-        </div>
-        <div class="auth-error hidden" id="otp-error"></div>
-        <div class="otp-resend-row">
-          <span class="otp-timer-label">Resend in <strong id="otp-timer">60</strong>s</span>
-          <button class="btn-link hidden" id="btn-resend-otp">Resend OTP</button>
-        </div>
-        <div class="dev-banner">
-          <span>Demo mode &mdash; OTP: <strong id="dev-otp-display">――</strong></span>
-        </div>
-        <button class="btn-auth" id="btn-verify-otp">Verify &amp; Continue</button>
-      </div>
-    </div>
-
-    <!-- Screen 4: Employee login -->
-    <div id="screen-employee-login" class="auth-screen">
-      <div class="auth-card">
-        <button class="auth-back" id="back-from-employee">&#8592; Back</button>
         <div class="auth-step-label">Employee verification</div>
         <h1 class="auth-heading">Sign in with your company email</h1>
-        <p class="auth-subheading">Use your <strong>@omtpi.com.ph</strong> address or a registered cPanel mailbox.</p>
+        <p class="auth-subheading">Use your <strong>@omtpi.com.ph</strong> employee account.</p>
+
         <div class="field-stack">
           <div class="field-group">
             <label class="field-label" for="emp-email">Company email</label>
             <input type="email" id="emp-email" class="auth-input" placeholder="you@omtpi.com.ph" autocomplete="email" />
-            <div class="field-hint">Must end in @omtpi.com.ph or be on the cPanel allowlist.</div>
           </div>
           <div class="field-group">
             <label class="field-label" for="emp-password">Password</label>
             <div class="password-wrap">
-              <input type="password" id="emp-password" class="auth-input"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password" />
+              <input type="password" id="emp-password" class="auth-input" placeholder="••••••••"
+                autocomplete="current-password" />
               <button class="btn-toggle-pw" id="toggle-pw" type="button" aria-label="Toggle visibility">
                 <svg id="pw-eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                   width="16" height="16">
@@ -164,149 +266,660 @@
             </div>
           </div>
         </div>
+
         <div class="auth-error hidden" id="emp-error"></div>
-        <div class="dev-banner">
-          Demo: <strong>agent@omtpi.com.ph</strong> / <strong>password123</strong>
-        </div>
         <button class="btn-auth" id="btn-employee-login">Sign in</button>
       </div>
     </div>
-
-  </div><!-- /#auth-gate -->
-
-
-  <!-- MAIN APP (hidden until auth) -->
-  <div id="app-shell" class="hidden">
-
-    <!-- Employee dashboard -->
-    <div id="employee-app" class="hidden">
-      <div class="app" id="app">
-        <aside class="sidebar" id="sidebar">
-          <div class="logo">
-            <div class="logo-mark">
-              <img src="/assets/images/LOGO_omtpi.png" class="logo-mark-img" alt="OMTPI Logo">
-            </div>
-            <div>
-              <div class="logo-text">OMTPI HelpDesk</div>
-              <div class="logo-sub">Operations and Maintenance Portal</div>
-            </div>
-          </div>
-          <div class="nav-section">Overview</div>
-          <div class="nav-item active" data-view="dashboard"><svg class="nav-icon" viewBox="0 0 16 16"
-              fill="currentColor">
-              <rect x="1" y="1" width="6" height="6" rx="1" />
-              <rect x="9" y="1" width="6" height="6" rx="1" />
-              <rect x="1" y="9" width="6" height="6" rx="1" />
-              <rect x="9" y="9" width="6" height="6" rx="1" />
-            </svg>Dashboard</div>
-            <div class="nav-item" data-view="favorites"><span class="nav-dot dot-green"></span>Favorites</div>
-          <div class="nav-item" data-view="archived"><span class="nav-dot dot-gray"></span>Archived</div>
-          <div class="nav-section">Queues</div>
-          <div class="nav-item" data-view="all"><span class="nav-dot dot-gray"></span>All tickets<span
-              class="badge badge-blue" id="badge-all">0</span></div>
-          <div class="nav-item" data-view="internal"><span class="nav-dot dot-purple"></span>Internal (IT/HR)<span
-              class="badge badge-purple" id="badge-int">0</span></div>
-          <div class="nav-item" data-view="external"><span class="nav-dot dot-teal"></span>External (clients)<span
-              class="badge badge-teal" id="badge-ext">0</span></div>
-          <div class="nav-section">Manage</div>
-          <div class="nav-item" data-view="resolved"><span class="nav-dot dot-green"></span>Resolved</div>
-          <div class="nav-item" id="new-ticket-nav"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M8 1v14M1 8h14" />
-            </svg>New ticket</div>
-          <div class="sidebar-footer">
-            <div class="session-info" id="session-info"></div><button class="btn-signout" id="btn-signout">Sign
-              out</button>
-          </div>
-        </aside>
-<div class="main">
-  <header class="topbar">
-    <h1 class="topbar-title" id="view-title">Dashboard</h1>
-    <input class="search" type="text" id="search-input" placeholder="Search tickets…" autocomplete="off" />
-
-    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2v2"></path>
-        <path d="M12 20v2"></path>
-        <path d="M4.93 4.93l1.41 1.41"></path>
-        <path d="M17.66 17.66l1.41 1.41"></path>
-        <path d="M2 12h2"></path>
-        <path d="M20 12h2"></path>
-        <path d="M4.93 19.07l1.41-1.41"></path>
-        <path d="M17.66 6.34l1.41-1.41"></path>
-      </svg>
-
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
-        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-      </svg>
-    </button>
-
-    <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
-  </header>
-
-  <div class="content" id="content-area"></div>
-</div>
-        <aside class="panel" id="detail-panel">
-          <div class="panel-header">
-            <div class="panel-title" id="panel-title">Ticket details</div><button class="btn"
-              id="panel-close-btn">Close</button>
-          </div>
-          <div class="panel-body" id="panel-body"></div>
-          <div class="panel-footer" id="panel-footer"></div>
-        </aside>
-      </div>
-      <div id="modal-container"></div>
-    </div>
-
-    <!-- Customer submit portal -->
-    <div id="customer-portal" class="hidden">
-      <div class="customer-topbar">
-  <div class="customer-logo">
-    <img src="/assets/images/LOGO_omtpi.png" class="customer-logo-img" alt="OMTPI Logo">
-    <div class="customer-logo-name">OMTPI Support</div>
   </div>
 
-  <div class="customer-user-info" id="customer-user-info"></div>
+  <!-- ═══════════════════ MAIN APP ═══════════════════ -->
+  <div id="app-shell" class="hidden">
+    <div class="app" id="app">
 
-  <button class="theme-toggle" id="theme-toggle-customer" type="button" aria-label="Toggle theme">
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
-      <circle cx="12" cy="12" r="4"></circle>
-      <path d="M12 2v2"></path>
-      <path d="M12 20v2"></path>
-      <path d="M4.93 4.93l1.41 1.41"></path>
-      <path d="M17.66 17.66l1.41 1.41"></path>
-      <path d="M2 12h2"></path>
-      <path d="M20 12h2"></path>
-      <path d="M4.93 19.07l1.41-1.41"></path>
-      <path d="M17.66 6.34l1.41-1.41"></path>
-    </svg>
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <div class="logo-mark">
+            <img src="/assets/images/LOGO_omtpi.png" class="logo-mark-img" alt="OMTPI Logo">
+          </div>
+          <div>
+            <div class="logo-text">OMTPI HelpDesk</div>
+            <div class="logo-sub">Operations and Maintenance Portal</div>
+          </div>
+        </div>
 
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-    </svg>
-  </button>
+        <div class="nav-section">Overview</div>
+        <div class="nav-item active" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1" />
+            <rect x="9" y="1" width="6" height="6" rx="1" />
+            <rect x="1" y="9" width="6" height="6" rx="1" />
+            <rect x="9" y="9" width="6" height="6" rx="1" />
+          </svg>
+          Dashboard
+        </div>
 
-  <button class="btn-signout-sm" id="btn-customer-signout">Sign out</button>
-</div>
-        <div class="customer-user-info" id="customer-user-info"></div>
-        <button class="btn-signout-sm" id="btn-customer-signout">Sign out</button>
+        <div class="nav-section">Queues</div>
+        <div class="nav-item" data-view="all">
+          <span class="nav-dot dot-gray"></span>
+          All tickets
+          <span class="badge badge-blue" id="badge-all">0</span>
+        </div>
+        <div class="nav-item" data-view="internal">
+          <span class="nav-dot dot-purple"></span>
+          Internal
+          <span class="badge badge-purple" id="badge-int">0</span>
+        </div>
+
+        <div class="nav-section">Manage</div>
+        <div class="nav-item" data-view="resolved">
+          <span class="nav-dot dot-green"></span>
+          Resolved
+        </div>
+        <div class="nav-item" id="new-ticket-nav">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <path d="M8 1v14M1 8h14" />
+          </svg>
+          New ticket
+        </div>
+
+        <!-- Admin only -->
+        <div class="nav-section admin-only" id="nav-section-admin">Admin</div>
+
+        <div class="nav-item admin-only" data-view="employees" id="nav-employees">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="6" cy="5" r="3"></circle>
+            <path d="M1 14c0-3 2-5 5-5s5 2 5 5"></path>
+            <path d="M13 7v4M11 9h4"></path>
+          </svg>
+          Employees / Users
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="session-info" id="session-info"></div>
+          <button class="btn-signout" id="btn-signout">Sign out</button>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main">
+        <header class="topbar">
+          <h1 class="topbar-title" id="view-title">Dashboard</h1>
+          <input class="search" type="text" id="search-input" placeholder="Search tickets…" autocomplete="off" />
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16"
+              height="16">
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16"
+              height="16">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+            </svg>
+          </button>
+          <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
+        </header>
+
+        <div class="content" id="content-area"></div>
       </div>
-      <div class="customer-content" id="customer-content"></div>
+
+      <!-- DETAIL PANEL -->
+      <aside class="panel" id="detail-panel">
+        <div class="panel-header">
+          <div class="panel-title" id="panel-title">Ticket details</div>
+          <button class="btn" id="panel-close-btn">Close</button>
+        </div>
+        <div class="panel-body" id="panel-body"></div>
+        <div class="panel-footer" id="panel-footer"></div>
+      </aside>
     </div>
 
-  </div><!-- /#app-shell -->
+    <div id="modal-container"></div>
+  </div>
 
-  <script src="/assets/js/data.js"></script>
+  <!-- ═══════════════════ TOAST ═══════════════════ -->
+  <div id="toast"></div>
+
+  <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
   <script src="/assets/js/utils.js"></script>
-  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/data.js"></script>
   <script src="/assets/js/render.js"></script>
   <script src="/assets/js/panel.js"></script>
   <script src="/assets/js/modal.js"></script>
-  <script src="/assets/js/customer.js"></script>
   <script src="/assets/js/app.js"></script>
-  <script src="/assets/js/theme.js"></script>
-  <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+
+  <script>
+    // ══════════════════════════════════════════════════
+    //  AUTH
+    // ══════════════════════════════════════════════════
+    const authGate = document.getElementById('auth-gate');
+    const appShell = document.getElementById('app-shell');
+    const empError = document.getElementById('emp-error');
+
+    let currentUser = null;
+
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+    function hideError(el) {
+      el.textContent = '';
+      el.classList.add('hidden');
+    }
+
+    // Password toggle
+    document.getElementById('toggle-pw').addEventListener('click', () => {
+      const input = document.getElementById('emp-password');
+      const show = document.getElementById('pw-eye-show');
+      const hide = document.getElementById('pw-eye-hide');
+      if (input.type === 'password') {
+        input.type = 'text';
+        show.classList.add('hidden');
+        hide.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        show.classList.remove('hidden');
+        hide.classList.add('hidden');
+      }
+    });
+
+    // Login
+    document.getElementById('btn-employee-login').addEventListener('click', async () => {
+      const email = document.getElementById('emp-email').value.trim();
+      const password = document.getElementById('emp-password').value;
+      const btn = document.getElementById('btn-employee-login');
+
+      hideError(empError);
+
+      if (!email || !password) {
+        showError(empError, 'Please enter your email and password.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const res = await fetch('/api/auth/employee-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(empError, data.error || 'Login failed.');
+          return;
+        }
+
+        currentUser = data.user;
+        bootApp();
+
+      } catch (err) {
+        showError(empError, 'Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+
+    // Enter key on password field
+    document.getElementById('emp-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('btn-employee-login').click();
+    });
+
+    // Sign out
+    document.getElementById('btn-signout').addEventListener('click', async () => {
+      await fetch('/api/auth/signout', { method: 'POST' });
+      currentUser = null;
+      appShell.classList.add('hidden');
+      authGate.classList.remove('hidden');
+      document.getElementById('emp-email').value = '';
+      document.getElementById('emp-password').value = '';
+    });
+
+    // Check existing session on page load
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+          bootApp();
+        }
+      } catch (_) { }
+    }
+
+    // ══════════════════════════════════════════════════
+    //  BOOT APP
+    // ══════════════════════════════════════════════════
+    function bootApp() {
+      authGate.classList.add('hidden');
+      appShell.classList.remove('hidden');
+
+      // Session info in sidebar
+      document.getElementById('session-info').textContent =
+        `${currentUser.name} · ${currentUser.empRole}`;
+
+      // Show admin-only elements
+      if (currentUser.empRole === 'admin') {
+        document.querySelectorAll('.admin-only').forEach(el => {
+          el.style.display = '';
+        });
+      }
+
+      // Nav click handling
+      document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          item.classList.add('active');
+          const view = item.dataset.view;
+          document.getElementById('view-title').textContent = viewTitles[view] || view;
+          renderView(view);
+        });
+      });
+
+      renderView('dashboard');
+    }
+
+    const viewTitles = {
+      dashboard: 'Dashboard',
+      all: 'All Tickets',
+      internal: 'Internal Tickets',
+      resolved: 'Resolved',
+      employees: 'Employees',
+    };
+
+    function renderView(view) {
+      const area = document.getElementById('content-area');
+      if (view === 'employees') {
+        renderEmployeesView(area);
+      } else {
+        // Hand off to existing app.js for ticket views
+        if (typeof window.loadView === 'function') window.loadView(view);
+      }
+    }
+
+    // ══════════════════════════════════════════════════
+    //  EMPLOYEES VIEW
+    // ══════════════════════════════════════════════════
+    async function renderEmployeesView(area) {
+      area.innerHTML = `<div style="color:var(--text-tertiary);font-size:13px">Loading employees…</div>`;
+
+      let employees = [];
+      try {
+        const res = await fetch('/api/employees');
+        const data = await res.json();
+        employees = data.employees || [];
+      } catch (err) {
+        area.innerHTML = `<div style="color:var(--color-red-400);font-size:13px">Failed to load employees.</div>`;
+        return;
+      }
+
+      const isAdmin = currentUser.empRole === 'admin';
+
+      area.innerHTML = `
+    <div class="emp-toolbar">
+      <input class="emp-search" id="emp-search" placeholder="Search employees…" />
+      ${isAdmin ? `<button class="btn btn-primary" id="btn-add-emp">+ Add employee</button>` : ''}
+    </div>
+    <table class="emp-table" id="emp-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Joined</th>
+          ${isAdmin ? '<th></th>' : ''}
+        </tr>
+      </thead>
+      <tbody id="emp-tbody"></tbody>
+    </table>
+  `;
+
+      renderEmpRows(employees, isAdmin);
+
+      // Search filter
+      document.getElementById('emp-search').addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        const filtered = employees.filter(emp =>
+          emp.name.toLowerCase().includes(q) ||
+          emp.email.toLowerCase().includes(q) ||
+          (emp.dept || '').toLowerCase().includes(q)
+        );
+        renderEmpRows(filtered, isAdmin);
+      });
+
+      // Add employee button
+      if (isAdmin) {
+        document.getElementById('btn-add-emp').addEventListener('click', () => {
+          openAddEmployeeModal(employees);
+        });
+      }
+    }
+
+    function renderEmpRows(employees, isAdmin) {
+      const tbody = document.getElementById('emp-tbody');
+      if (!employees.length) {
+        tbody.innerHTML = `<tr><td colspan="${isAdmin ? 7 : 6}" style="text-align:center;padding:32px;color:var(--text-tertiary);font-size:13px">No employees found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = employees.map(emp => {
+        const joined = new Date(emp.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        return `
+      <tr>
+        <td><strong style="font-weight:500">${esc(emp.name)}</strong></td>
+        <td style="color:var(--text-secondary)">${esc(emp.email)}</td>
+        <td><span class="emp-role-pill emp-role-${emp.role}">${emp.role}</span></td>
+        <td style="color:var(--text-secondary)">${emp.dept ? esc(emp.dept) : '<span style="color:var(--text-tertiary)">—</span>'}</td>
+        <td><span class="${emp.active ? 'emp-status-active' : 'emp-status-inactive'}">${emp.active ? '● Active' : '● Inactive'}</span></td>
+        <td style="color:var(--text-tertiary);font-size:12px">${joined}</td>
+        ${isAdmin ? `
+        <td>
+          <div class="emp-actions">
+            <button class="btn btn-sm" onclick="openEditEmployeeModal(${emp.id}, '${esc(emp.name)}', '${emp.role}', '${emp.dept || ''}', ${emp.active})">Edit</button>
+            <button class="btn btn-sm" onclick="openResetPasswordModal(${emp.id}, '${esc(emp.name)}')">Reset PW</button>
+          </div>
+        </td>` : ''}
+      </tr>
+    `;
+      }).join('');
+    }
+
+    function esc(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Add Employee Modal ────────────────────────────
+    function openAddEmployeeModal() {
+      const container = document.getElementById('modal-container');
+      container.innerHTML = `
+    <div class="modal-overlay" id="emp-modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-header-title">Add Employee</div>
+          <button class="btn btn-sm" id="close-emp-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-form-grid">
+            <div class="mfield span-2">
+              <label>Full Name</label>
+              <input type="text" id="new-emp-name" placeholder="Juan dela Cruz" />
+            </div>
+            <div class="mfield span-2">
+              <label>Email</label>
+              <input type="email" id="new-emp-email" placeholder="juan@omtpi.com.ph" />
+            </div>
+            <div class="mfield">
+              <label>Password</label>
+              <input type="password" id="new-emp-password" placeholder="Min. 8 characters" />
+            </div>
+            <div class="mfield">
+              <label>Role</label>
+              <select id="new-emp-role">
+                <option value="agent">Agent</option>
+                <option value="admin">Admin</option>
+                <option value="viewer">Viewer</option>
+              </select>
+            </div>
+            <div class="mfield span-2">
+              <label>Department</label>
+              <input type="text" id="new-emp-dept" placeholder="e.g. IT, Operations" />
+            </div>
+          </div>
+          <div class="modal-error" id="emp-modal-error"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" id="cancel-emp-modal">Cancel</button>
+          <button class="btn btn-primary" id="save-emp-btn">Create Employee</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+      document.getElementById('close-emp-modal').onclick =
+        document.getElementById('cancel-emp-modal').onclick = () => container.innerHTML = '';
+      document.getElementById('emp-modal-overlay').onclick = e => { if (e.target.id === 'emp-modal-overlay') container.innerHTML = ''; };
+
+      document.getElementById('save-emp-btn').addEventListener('click', async () => {
+        const name = document.getElementById('new-emp-name').value.trim();
+        const email = document.getElementById('new-emp-email').value.trim();
+        const password = document.getElementById('new-emp-password').value;
+        const role = document.getElementById('new-emp-role').value;
+        const dept = document.getElementById('new-emp-dept').value.trim();
+        const errEl = document.getElementById('emp-modal-error');
+        errEl.style.display = 'none';
+
+        if (!name || !email || !password) {
+          errEl.textContent = 'Name, email, and password are required.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        const btn = document.getElementById('save-emp-btn');
+        btn.disabled = true;
+        btn.textContent = 'Creating…';
+
+        try {
+          const res = await fetch('/api/employees', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, role, dept }),
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            errEl.textContent = data.error || 'Failed to create employee.';
+            errEl.style.display = 'block';
+            return;
+          }
+
+          container.innerHTML = '';
+          showToast(`✓ ${email} created successfully`);
+          // Refresh the employees view
+          renderEmployeesView(document.getElementById('content-area'));
+
+        } catch (_) {
+          errEl.textContent = 'Network error. Try again.';
+          errEl.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Create Employee';
+        }
+      });
+    }
+
+    // ── Edit Employee Modal ───────────────────────────
+    window.openEditEmployeeModal = function (id, name, role, dept, active) {
+      const container = document.getElementById('modal-container');
+      container.innerHTML = `
+    <div class="modal-overlay" id="edit-modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-header-title">Edit Employee</div>
+          <button class="btn btn-sm" id="close-edit-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-form-grid">
+            <div class="mfield span-2">
+              <label>Full Name</label>
+              <input type="text" id="edit-emp-name" value="${esc(name)}" />
+            </div>
+            <div class="mfield">
+              <label>Role</label>
+              <select id="edit-emp-role">
+                <option value="agent"  ${role === 'agent' ? 'selected' : ''}>Agent</option>
+                <option value="admin"  ${role === 'admin' ? 'selected' : ''}>Admin</option>
+                <option value="viewer" ${role === 'viewer' ? 'selected' : ''}>Viewer</option>
+              </select>
+            </div>
+            <div class="mfield">
+              <label>Status</label>
+              <select id="edit-emp-active">
+                <option value="1" ${active ? 'selected' : ''}>Active</option>
+                <option value="0" ${!active ? 'selected' : ''}>Inactive</option>
+              </select>
+            </div>
+            <div class="mfield span-2">
+              <label>Department</label>
+              <input type="text" id="edit-emp-dept" value="${esc(dept)}" />
+            </div>
+          </div>
+          <div class="modal-error" id="edit-modal-error"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" id="delete-emp-btn">Delete</button>
+          <button class="btn" id="cancel-edit-modal">Cancel</button>
+          <button class="btn btn-primary" id="save-edit-btn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+      document.getElementById('close-edit-modal').onclick =
+        document.getElementById('cancel-edit-modal').onclick = () => container.innerHTML = '';
+
+      document.getElementById('save-edit-btn').addEventListener('click', async () => {
+        const errEl = document.getElementById('edit-modal-error');
+        errEl.style.display = 'none';
+        const btn = document.getElementById('save-edit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        try {
+          const res = await fetch(`/api/employees/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('edit-emp-name').value.trim(),
+              role: document.getElementById('edit-emp-role').value,
+              dept: document.getElementById('edit-emp-dept').value.trim(),
+              active: document.getElementById('edit-emp-active').value === '1',
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
+          container.innerHTML = '';
+          showToast('✓ Employee updated');
+          renderEmployeesView(document.getElementById('content-area'));
+        } catch (_) {
+          errEl.textContent = 'Network error.';
+          errEl.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+        }
+      });
+
+      document.getElementById('delete-emp-btn').addEventListener('click', async () => {
+        if (!confirm(`Delete ${name}? This cannot be undone.`)) return;
+        const res = await fetch(`/api/employees/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error); return; }
+        container.innerHTML = '';
+        showToast('✓ Employee deleted');
+        renderEmployeesView(document.getElementById('content-area'));
+      });
+    };
+
+    // ── Reset Password Modal ──────────────────────────
+    window.openResetPasswordModal = function (id, name) {
+      const container = document.getElementById('modal-container');
+      container.innerHTML = `
+    <div class="modal-overlay" id="pw-modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-header-title">Reset Password — ${esc(name)}</div>
+          <button class="btn btn-sm" id="close-pw-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-form-grid">
+            <div class="mfield span-2">
+              <label>New Password</label>
+              <input type="password" id="new-pw" placeholder="Min. 8 characters" />
+            </div>
+            <div class="mfield span-2">
+              <label>Confirm Password</label>
+              <input type="password" id="confirm-pw" placeholder="Repeat password" />
+            </div>
+          </div>
+          <div class="modal-error" id="pw-modal-error"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" id="cancel-pw-modal">Cancel</button>
+          <button class="btn btn-primary" id="save-pw-btn">Reset Password</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+      document.getElementById('close-pw-modal').onclick =
+        document.getElementById('cancel-pw-modal').onclick = () => container.innerHTML = '';
+
+      document.getElementById('save-pw-btn').addEventListener('click', async () => {
+        const pw = document.getElementById('new-pw').value;
+        const confirm = document.getElementById('confirm-pw').value;
+        const errEl = document.getElementById('pw-modal-error');
+        errEl.style.display = 'none';
+
+        if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+        if (pw !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+        const btn = document.getElementById('save-pw-btn');
+        btn.disabled = true; btn.textContent = 'Saving…';
+
+        try {
+          const res = await fetch(`/api/employees/${id}/password`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pw }),
+          });
+          const data = await res.json();
+          if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
+          container.innerHTML = '';
+          showToast('✓ Password reset successfully');
+        } catch (_) {
+          errEl.textContent = 'Network error.';
+          errEl.style.display = 'block';
+        } finally {
+          btn.disabled = false; btn.textContent = 'Reset Password';
+        }
+      });
+    };
+
+    // ══════════════════════════════════════════════════
+    //  TOAST
+    // ══════════════════════════════════════════════════
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ══════════════════════════════════════════════════
+    //  THEME TOGGLE
+    // ══════════════════════════════════════════════════
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+
+    // ══════════════════════════════════════════════════
+    //  INIT
+    // ══════════════════════════════════════════════════
+    checkSession();
+  </script>
+
 </body>
 
 </html>
