@@ -44,3 +44,8 @@
   > routes 
      - auth.js 
      - employees.js
+
+
+
+
+mail by department (Admin - HR, Admin - FU, MD - Network Management, Maintenance (MD), General Office (GO), Technical Service (TS), Engineering (ED), Planning & Design (PD), Warehouse (WH), Sales, IQS, Purchasing (PU), Accounting)  or mail only active agents/admins. and i want to
