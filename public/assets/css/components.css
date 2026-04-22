@@ -1,5 +1,9 @@
 /* components.css — reusable UI components */
 
+.mail-row:hover {
+  background: var(--bg-secondary) !important;
+}
+
 /* ── Buttons ── */
 .btn {
   display: inline-flex;

@@ -1,5 +1,9 @@
 /* dashboard.css */
 
+.mail-row:hover {
+  background: var(--bg-secondary) !important;
+}
+
 /* Stat cards grid */
 .stat-grid {
   display: grid;

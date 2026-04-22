@@ -32,8 +32,25 @@ function esc(str) {
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
+
+const DEPARTMENTS = [
+  'Admin - HR',
+  'Admin - FU',
+  'MD - Network Management',
+  'Maintenance (MD)',
+  'General Office (GO)',
+  'Technical Service (TS)',
+  'Engineering (ED)',
+  'Planning & Design (PD)',
+  'Warehouse (WH)',
+  'Sales',
+  'IQS',
+  'Purchasing (PU)',
+  'Accounting'
+];
 
 // ══════════════════════════════════════════════════
 //  AUTH MODULE
@@ -184,6 +201,7 @@ const viewTitles = {
   internal: 'Internal Tickets',
   resolved: 'Resolved',
   employees: 'Employees',
+  mail: 'Mail'
 };
 
 function renderView(view) {
@@ -205,6 +223,11 @@ function renderView(view) {
       return;
     }
     renderEmployeesView(area);
+    return;
+  }
+
+  if (view === 'mail') {
+    renderMailView(area);
     return;
   }
 
@@ -248,14 +271,12 @@ async function renderDashboard(area) {
           Employee Dashboard
         </div>
         <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">
-          Welcome to the OMTPI HelpDesk employee workspace.<br>
-          Use this area for employee tools, internal announcements, and future mailing features.
+          Welcome to the OMTPI HelpDesk employee workspace.
         </div>
 
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn btn-primary" id="dash-open-my-tools">Open Tools</button>
+          <button class="btn btn-primary" id="dash-open-mail">Open Mail</button>
           ${isAdmin ? `<button class="btn" id="dash-open-employees">Manage Employees</button>` : ''}
-          <button class="btn" id="dash-open-mailing">Mailing</button>
         </div>
       </div>
 
@@ -270,72 +291,14 @@ async function renderDashboard(area) {
         </div>
       </div>
     </div>
-
-    <div id="dashboard-lower" style="margin-top:16px;"></div>
   `;
 
-  $('dash-open-my-tools')?.addEventListener('click', () => {
-    const lower = $('dashboard-lower');
-    lower.innerHTML = `
-      <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
-        <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">Employee Tools</div>
-        <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">
-          This section can later contain:
-          <br>• My tickets
-          <br>• Assigned tickets
-          <br>• Internal notices
-          <br>• Team mailing shortcuts
-        </div>
-      </div>
-    `;
-  });
-
-  $('dash-open-mailing')?.addEventListener('click', () => {
-    const lower = $('dashboard-lower');
-    lower.innerHTML = `
-      <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-          <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Mailing Panel</div>
-          <span class="badge badge-blue">UI only for now</span>
-        </div>
-
-        <div class="field-row">
-          <div class="field span-2">
-            <label>Recipients</label>
-            <input type="text" id="mailing-to" placeholder="e.g. all@omtpi.com.ph or employee@omtpi.com.ph" />
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field span-2">
-            <label>Subject</label>
-            <input type="text" id="mailing-subject" placeholder="Mail subject" />
-          </div>
-        </div>
-
-        <div class="field-row full">
-          <div class="field">
-            <label>Message</label>
-            <textarea id="mailing-body" placeholder="Write your message here..."></textarea>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:8px;">
-          <button class="btn" id="mailing-clear">Clear</button>
-          <button class="btn btn-primary" id="mailing-send-demo">Send (demo)</button>
-        </div>
-      </div>
-    `;
-
-    $('mailing-clear')?.addEventListener('click', () => {
-      $('mailing-to').value = '';
-      $('mailing-subject').value = '';
-      $('mailing-body').value = '';
-    });
-
-    $('mailing-send-demo')?.addEventListener('click', () => {
-      showToast('Mailing UI ready. Backend send route can be added next.');
-    });
+  $('dash-open-mail')?.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const mailNav = document.querySelector('.nav-item[data-view="mail"]');
+    mailNav?.classList.add('active');
+    $('view-title').textContent = 'Mail';
+    renderMailView($('content-area'));
   });
 
   $('dash-open-employees')?.addEventListener('click', () => {
@@ -436,7 +399,7 @@ async function renderEmployeesView(area) {
 
   if (isAdmin) {
     $('btn-add-emp')?.addEventListener('click', () => openAddEmployeeModal());
-    $('btn-mail-users')?.addEventListener('click', () => openMailUsersModal(employees));
+    $('btn-mail-users')?.addEventListener('click', () => openLegacyMailUsersModal(employees));
   }
 }
 
@@ -517,7 +480,7 @@ function openAddEmployeeModal() {
             </div>
             <div class="mfield span-2">
               <label>Department</label>
-              <input type="text" id="new-emp-dept" placeholder="e.g. IT, Operations" />
+              <input type="text" id="new-emp-dept" placeholder="e.g. Technical Service (TS)" />
             </div>
           </div>
           <div class="modal-error" id="emp-modal-error"></div>
@@ -587,8 +550,8 @@ function openAddEmployeeModal() {
   });
 }
 
-// ── Mail Users Modal ───────────────────────────────
-function openMailUsersModal(employees) {
+// ── Legacy quick mail modal from employees view ─────────────────
+function openLegacyMailUsersModal(employees) {
   const container = $('modal-container');
   const allEmails = employees.map(emp => emp.email).filter(Boolean).join(', ');
 
@@ -681,10 +644,10 @@ function openMailUsersModal(employees) {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          mode: sendToAll ? 'active_agents_admins' : 'custom',
           recipients,
           subject,
-          message,
-          sendToAll
+          message
         }),
       });
 
@@ -698,13 +661,545 @@ function openMailUsersModal(employees) {
 
       close();
       showToast(`✓ Mail sent to ${data.sentCount} recipient(s)`);
-    } catch (err) {
+    } catch {
       errEl.textContent = 'Network/server error while sending mail.';
       errEl.style.display = 'block';
     } finally {
       sendBtn.disabled = false;
       sendBtn.textContent = 'Send Mail';
     }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  MAIL VIEW
+// ══════════════════════════════════════════════════
+async function renderMailView(area) {
+  const user = Auth.getCurrentUser();
+  const isAdmin = user?.empRole === 'admin';
+
+  area.innerHTML = `
+    <div class="tabs" id="mail-tabs">
+      ${isAdmin ? `
+        <div class="tab active" data-mail-tab="compose">Compose</div>
+        <div class="tab" data-mail-tab="stats">Stats</div>
+        <div class="tab" data-mail-tab="forwarding">Forwarding</div>
+        <div class="tab" data-mail-tab="mailbox">Mailbox</div>
+      ` : `
+        <div class="tab active" data-mail-tab="mailbox">Mailbox</div>
+      `}
+    </div>
+    <div id="mail-content"></div>
+  `;
+
+  const defaultTab = isAdmin ? 'compose' : 'mailbox';
+  await renderMailTab(defaultTab);
+
+  document.querySelectorAll('[data-mail-tab]').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      document.querySelectorAll('[data-mail-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      await renderMailTab(tab.dataset.mailTab);
+    });
+  });
+}
+
+async function renderMailTab(tab) {
+  if (tab === 'compose') return renderMailCompose();
+  if (tab === 'stats') return renderMailStats();
+  if (tab === 'forwarding') return renderMailForwarding();
+  return renderMailbox();
+}
+
+// ── Compose ───────────────────────────────────────
+async function renderMailCompose() {
+  const content = $('mail-content');
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+        <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Send Mail</div>
+
+        <div class="field-row full">
+          <div class="field">
+            <label>Send Mode</label>
+            <select id="mail-mode">
+              <option value="department">By Department</option>
+              <option value="active_agents_admins">Active Agents/Admins</option>
+              <option value="custom">Custom Recipients</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row full" id="mail-dept-wrap">
+          <div class="field">
+            <label>Department</label>
+            <select id="mail-department">
+              ${DEPARTMENTS.map(dept => `<option value="${esc(dept)}">${esc(dept)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row full" id="mail-custom-wrap" style="display:none;">
+          <div class="field">
+            <label>Custom Recipients</label>
+            <textarea id="mail-custom-recipients" placeholder="employee1@omtpi.com.ph, employee2@omtpi.com.ph"></textarea>
+          </div>
+        </div>
+
+        <div class="field-row full">
+          <div class="field">
+            <label>Subject</label>
+            <input type="text" id="mail-subject" placeholder="Mail subject" />
+          </div>
+        </div>
+
+        <div class="field-row full">
+          <div class="field">
+            <label>Message</label>
+            <textarea id="mail-message" placeholder="Write your message here..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-error" id="mail-compose-error" style="display:none;"></div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+          <button class="btn" id="mail-compose-clear">Clear</button>
+          <button class="btn btn-primary" id="mail-compose-send">Send Mail</button>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+        <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Mailing Notes</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+          <strong>By Department:</strong> sends to active employees in the selected department.<br>
+          <strong>Active Agents/Admins:</strong> sends only to active users with role admin or agent.<br>
+          <strong>Custom:</strong> send to selected employee emails.<br><br>
+          Forwarding rules will also apply if they are active.
+        </div>
+      </div>
+    </div>
+  `;
+
+  $('mail-mode')?.addEventListener('change', () => {
+    const mode = $('mail-mode').value;
+    $('mail-dept-wrap').style.display = mode === 'department' ? '' : 'none';
+    $('mail-custom-wrap').style.display = mode === 'custom' ? '' : 'none';
+  });
+
+  $('mail-compose-clear')?.addEventListener('click', () => {
+    $('mail-subject').value = '';
+    $('mail-message').value = '';
+    if ($('mail-custom-recipients')) $('mail-custom-recipients').value = '';
+  });
+
+  $('mail-compose-send')?.addEventListener('click', async () => {
+    const errEl = $('mail-compose-error');
+    const btn = $('mail-compose-send');
+
+    const mode = $('mail-mode').value;
+    const department = $('mail-department')?.value || '';
+    const recipients = $('mail-custom-recipients')?.value || '';
+    const subject = $('mail-subject').value.trim();
+    const message = $('mail-message').value.trim();
+
+    errEl.style.display = 'none';
+
+    if (!subject || !message) {
+      errEl.textContent = 'Subject and message are required.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (mode === 'custom' && !recipients.trim()) {
+      errEl.textContent = 'Custom recipients are required for custom mode.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/mail/send', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode, department, recipients, subject, message }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        errEl.textContent = data.error || 'Failed to send mail.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      showToast(`✓ Mail sent to ${data.sentCount} recipient(s)`);
+      $('mail-subject').value = '';
+      $('mail-message').value = '';
+      if ($('mail-custom-recipients')) $('mail-custom-recipients').value = '';
+    } catch {
+      errEl.textContent = 'Network/server error while sending mail.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Mail';
+    }
+  });
+}
+
+// ── Stats ─────────────────────────────────────────
+async function renderMailStats() {
+  const content = $('mail-content');
+  content.innerHTML = `<div style="color:var(--text-tertiary);font-size:13px">Loading mail stats…</div>`;
+
+  try {
+    const [deptRes, roleRes] = await Promise.all([
+      fetch('/api/mail/stats/departments', { credentials: 'include' }),
+      fetch('/api/mail/stats/roles', { credentials: 'include' })
+    ]);
+
+    const deptData = await deptRes.json();
+    const roleData = await roleRes.json();
+
+    if (!deptRes.ok) throw new Error(deptData.error || 'Failed to load department stats.');
+    if (!roleRes.ok) throw new Error(roleData.error || 'Failed to load role stats.');
+
+    const deptStats = deptData.stats || [];
+    const roleStats = roleData.stats || [];
+
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+          <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Emails Sent Per Department</div>
+          ${renderSimpleStatsTable('Department', 'Sent', deptStats.map(row => [row.department, row.sent_count]))}
+        </div>
+
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+          <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Emails Sent Per Role</div>
+          ${renderSimpleStatsTable('Role', 'Sent', roleStats.map(row => [row.role, row.sent_count]))}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    content.innerHTML = `
+      <div style="color:var(--color-red-400);font-size:13px;padding:20px">
+        Failed to load mail stats: ${esc(err.message)}
+      </div>
+    `;
+  }
+}
+
+function renderSimpleStatsTable(col1, col2, rows) {
+  if (!rows.length) {
+    return `<div style="font-size:13px;color:var(--text-tertiary);">No data yet.</div>`;
+  }
+
+  return `
+    <table class="emp-table">
+      <thead>
+        <tr>
+          <th>${esc(col1)}</th>
+          <th>${esc(col2)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => `
+          <tr>
+            <td>${esc(row[0])}</td>
+            <td>${esc(row[1])}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ── Forwarding ────────────────────────────────────
+async function renderMailForwarding() {
+  const content = $('mail-content');
+  content.innerHTML = `<div style="color:var(--text-tertiary);font-size:13px">Loading forwarding manager…</div>`;
+
+  try {
+    const [empRes, fwdRes] = await Promise.all([
+      fetch('/api/employees', { credentials: 'include' }),
+      fetch('/api/mail/forwarding', { credentials: 'include' })
+    ]);
+
+    const empData = await empRes.json();
+    const fwdData = await fwdRes.json();
+
+    if (!empRes.ok) throw new Error(empData.error || 'Failed to load employees.');
+    if (!fwdRes.ok) throw new Error(fwdData.error || 'Failed to load forwarding rules.');
+
+    const employees = empData.employees || [];
+    const forwarding = fwdData.forwarding || [];
+
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+          <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Set Forwarding</div>
+
+          <div class="field-row full">
+            <div class="field">
+              <label>Source Employee</label>
+              <select id="forward-source">
+                ${employees.map(emp => `<option value="${emp.id}">${esc(emp.name)} — ${esc(emp.email)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row full">
+            <div class="field">
+              <label>Forward To</label>
+              <select id="forward-target">
+                ${employees.map(emp => `<option value="${emp.id}">${esc(emp.name)} — ${esc(emp.email)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row full">
+            <div class="field">
+              <label style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="forward-active" checked />
+                Active rule
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-error" id="forward-error" style="display:none;"></div>
+
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+            <button class="btn btn-primary" id="save-forwarding-btn">Save Forwarding</button>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);padding:18px;">
+          <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">Current Forwarding Rules</div>
+          ${
+            forwarding.length
+              ? `
+                <table class="emp-table">
+                  <thead>
+                    <tr>
+                      <th>Source</th>
+                      <th>Target</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${forwarding.map(rule => `
+                      <tr>
+                        <td>${esc(rule.source_name)}<br><span style="font-size:12px;color:var(--text-tertiary)">${esc(rule.source_email)}</span></td>
+                        <td>${esc(rule.target_name)}<br><span style="font-size:12px;color:var(--text-tertiary)">${esc(rule.target_email)}</span></td>
+                        <td>${rule.active ? 'Active' : 'Inactive'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `
+              : `<div style="font-size:13px;color:var(--text-tertiary);">No forwarding rules yet.</div>`
+          }
+        </div>
+      </div>
+    `;
+
+    $('save-forwarding-btn')?.addEventListener('click', async () => {
+      const errEl = $('forward-error');
+      const sourceEmployeeId = Number($('forward-source').value);
+      const targetEmployeeId = Number($('forward-target').value);
+      const active = $('forward-active').checked;
+
+      errEl.style.display = 'none';
+
+      if (sourceEmployeeId === targetEmployeeId) {
+        errEl.textContent = 'Source and target employee cannot be the same.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const btn = $('save-forwarding-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await fetch('/api/mail/forwarding', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sourceEmployeeId, targetEmployeeId, active }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Failed to save forwarding.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        showToast('✓ Forwarding rule saved');
+        renderMailForwarding();
+      } catch {
+        errEl.textContent = 'Network/server error while saving forwarding.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Forwarding';
+      }
+    });
+  } catch (err) {
+    content.innerHTML = `
+      <div style="color:var(--color-red-400);font-size:13px;padding:20px">
+        Failed to load forwarding manager: ${esc(err.message)}
+      </div>
+    `;
+  }
+}
+
+// ── Mailbox ───────────────────────────────────────
+async function renderMailbox() {
+  const content = $('mail-content');
+  content.innerHTML = `<div style="color:var(--text-tertiary);font-size:13px">Loading mailbox…</div>`;
+
+  try {
+    const res = await fetch('/api/mail/mailbox', { credentials: 'include' });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Failed to load mailbox.');
+
+    const messages = data.messages || [];
+
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;min-height:520px;">
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;">
+          <div style="padding:14px 16px;border-bottom:0.5px solid var(--border-default);font-size:15px;font-weight:600;color:var(--text-primary);">
+            Inbox
+          </div>
+          <div id="mail-list">
+            ${messages.length ? messages.map((msg, i) => `
+              <div class="mail-row ${i === 0 ? 'active' : ''}" data-mail-index="${i}" style="padding:14px 16px;border-bottom:0.5px solid var(--border-default);cursor:pointer;background:${i === 0 ? 'var(--bg-secondary)' : 'transparent'};">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">
+                  ${esc(msg.subject)}
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">
+                  From: ${esc(msg.sender_name)}${msg.delivery_type === 'forwarded' ? ' · Forwarded' : ''}
+                </div>
+                <div style="font-size:12px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  ${stripHtml(msg.body_html || '')}
+                </div>
+              </div>
+            `).join('') : `
+              <div style="padding:20px;font-size:13px;color:var(--text-tertiary);">No mail yet.</div>
+            `}
+          </div>
+        </div>
+
+        <div style="background:var(--bg-primary);border:0.5px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;">
+          <div id="mail-preview"></div>
+        </div>
+      </div>
+    `;
+
+    if (messages.length) {
+      renderMailPreview(messages[0]);
+      document.querySelectorAll('[data-mail-index]').forEach(row => {
+        row.addEventListener('click', () => {
+          document.querySelectorAll('[data-mail-index]').forEach(el => {
+            el.classList.remove('active');
+            el.style.background = 'transparent';
+          });
+          row.classList.add('active');
+          row.style.background = 'var(--bg-secondary)';
+          renderMailPreview(messages[Number(row.dataset.mailIndex)]);
+        });
+      });
+    } else {
+      $('mail-preview').innerHTML = `
+        <div style="padding:24px;font-size:13px;color:var(--text-tertiary);">Nothing to preview.</div>
+      `;
+    }
+  } catch (err) {
+    content.innerHTML = `
+      <div style="color:var(--color-red-400);font-size:13px;padding:20px">
+        Failed to load mailbox: ${esc(err.message)}
+      </div>
+    `;
+  }
+}
+
+function renderMailPreview(msg, reloadMailbox, archived) {
+  $('mail-preview').innerHTML = `
+    <div style="padding:18px;border-bottom:0.5px solid var(--border-default);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">
+          ${esc(msg.subject)}
+        </div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+          <strong>From:</strong> ${esc(msg.sender_name)} (${esc(msg.sender_email)})<br>
+          <strong>To:</strong> ${esc(msg.recipient_name || msg.recipient_email)}<br>
+          <strong>Department:</strong> ${esc(msg.recipient_dept || '—')}<br>
+          <strong>Role:</strong> ${esc(msg.recipient_role || '—')}<br>
+          <strong>Delivery:</strong> ${esc(msg.delivery_type)}<br>
+          <strong>Date:</strong> ${new Date(msg.created_at).toLocaleString('en-PH')}<br>
+          <strong>Status:</strong> ${msg.is_read ? 'Read' : 'Unread'}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${
+          msg.is_read
+            ? `<button class="btn" id="mail-mark-unread-btn">Mark Unread</button>`
+            : `<button class="btn" id="mail-mark-read-btn">Mark Read</button>`
+        }
+        ${
+          archived
+            ? `<button class="btn" id="mail-unarchive-btn">Unarchive</button>`
+            : `<button class="btn" id="mail-archive-btn">Archive</button>`
+        }
+      </div>
+    </div>
+
+    <div style="padding:18px;font-size:14px;color:var(--text-primary);line-height:1.8;">
+      ${msg.body_html || ''}
+    </div>
+  `;
+
+  $('mail-mark-read-btn')?.addEventListener('click', async () => {
+    await fetch(`/api/mail/mailbox/${msg.id}/read`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    showToast('✓ Marked as read');
+    reloadMailbox();
+  });
+
+  $('mail-mark-unread-btn')?.addEventListener('click', async () => {
+    await fetch(`/api/mail/mailbox/${msg.id}/unread`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    showToast('✓ Marked as unread');
+    reloadMailbox();
+  });
+
+  $('mail-archive-btn')?.addEventListener('click', async () => {
+    await fetch(`/api/mail/mailbox/${msg.id}/archive`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    showToast('✓ Mail archived');
+    reloadMailbox();
+  });
+
+  $('mail-unarchive-btn')?.addEventListener('click', async () => {
+    await fetch(`/api/mail/mailbox/${msg.id}/unarchive`, {
+      method: 'PATCH',
+      credentials: 'include'
+    });
+    showToast('✓ Mail restored');
+    reloadMailbox();
   });
 }
 
