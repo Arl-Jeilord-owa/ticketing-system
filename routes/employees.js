@@ -1,17 +1,20 @@
+// routes/employees.js — CRUD for employee accounts (admin-managed)
 const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const db = require('../db');
+const router  = express.Router();
+const bcrypt  = require('bcryptjs');
+const db      = require('../db');
 
-// ── Middleware ────────────────────────────────────────────────
+// ── Middleware ─────────────────────────────────────────────
 
+/** Any logged-in staff member */
 function requireEmployee(req, res, next) {
   if (!req.session?.user || req.session.user.role !== 'employee') {
-    return res.status(403).json({ error: 'Employee access required.' });
+    return res.status(403).json({ error: 'Login required.' });
   }
   next();
 }
 
+/** Admin-rank staff only */
 function requireAdmin(req, res, next) {
   if (!req.session?.user || req.session.user.empRole !== 'admin') {
     return res.status(403).json({ error: 'Admin access required.' });
@@ -19,8 +22,7 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// ── GET all employees (any logged-in employee can view) ───────
-
+// ── GET /api/employees ─────────────────────────────────────
 router.get('/', requireEmployee, async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -30,13 +32,12 @@ router.get('/', requireEmployee, async (req, res) => {
     );
     return res.json({ employees: rows });
   } catch (err) {
-    console.error('[GET /employees]', err);
+    console.error('[GET /api/employees]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });
 
-// ── POST create new employee (admin only) ─────────────────────
-
+// ── POST /api/employees ────────────────────────────────────
 router.post('/', requireAdmin, async (req, res) => {
   try {
     const { name, email, password, role = 'agent', dept } = req.body;
@@ -52,7 +53,7 @@ router.post('/', requireAdmin, async (req, res) => {
     }
 
     const [existing] = await db.query(
-      'SELECT id FROM employees WHERE email = ?',
+      'SELECT id FROM employees WHERE email = ? LIMIT 1',
       [lower]
     );
     if (existing.length) {
@@ -70,33 +71,28 @@ router.post('/', requireAdmin, async (req, res) => {
       [name.trim(), lower, hash, role, dept || null]
     );
 
-    return res.status(201).json({
-      success: true,
-      message: `Employee ${lower} created.`,
-      id: result.insertId
-    });
+    return res.status(201).json({ success: true, id: result.insertId });
 
   } catch (err) {
-    console.error('[POST /employees]', err);
+    console.error('[POST /api/employees]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });
 
-// ── PATCH update employee (admin only) ───────────────────────
-
+// ── PATCH /api/employees/:id ───────────────────────────────
 router.patch('/:id', requireAdmin, async (req, res) => {
   try {
     const { name, role, dept, active } = req.body;
     const fields = [];
     const values = [];
 
-    if (name      !== undefined) { fields.push('name = ?');   values.push(name.trim()); }
-    if (role      !== undefined) { fields.push('role = ?');   values.push(role); }
-    if (dept      !== undefined) { fields.push('dept = ?');   values.push(dept || null); }
-    if (active    !== undefined) { fields.push('active = ?'); values.push(active ? 1 : 0); }
+    if (name   !== undefined) { fields.push('name = ?');   values.push(name.trim()); }
+    if (role   !== undefined) { fields.push('role = ?');   values.push(role); }
+    if (dept   !== undefined) { fields.push('dept = ?');   values.push(dept || null); }
+    if (active !== undefined) { fields.push('active = ?'); values.push(active ? 1 : 0); }
 
     if (!fields.length) {
-      return res.status(400).json({ error: 'No fields provided.' });
+      return res.status(400).json({ error: 'No fields to update.' });
     }
 
     values.push(req.params.id);
@@ -113,13 +109,12 @@ router.patch('/:id', requireAdmin, async (req, res) => {
     return res.json({ success: true });
 
   } catch (err) {
-    console.error('[PATCH /employees/:id]', err);
+    console.error('[PATCH /api/employees/:id]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });
 
-// ── PATCH reset password (admin only) ────────────────────────
-
+// ── PATCH /api/employees/:id/password ─────────────────────
 router.patch('/:id/password', requireAdmin, async (req, res) => {
   try {
     const { password } = req.body;
@@ -139,19 +134,17 @@ router.patch('/:id/password', requireAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Employee not found.' });
     }
 
-    return res.json({ success: true, message: 'Password updated.' });
+    return res.json({ success: true });
 
   } catch (err) {
-    console.error('[PATCH /employees/:id/password]', err);
+    console.error('[PATCH /api/employees/:id/password]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });
 
-// ── DELETE employee (admin only) ─────────────────────────────
-
+// ── DELETE /api/employees/:id ──────────────────────────────
 router.delete('/:id', requireAdmin, async (req, res) => {
   try {
-    // Prevent self-deletion
     if (parseInt(req.params.id) === req.session.user.id) {
       return res.status(400).json({ error: 'You cannot delete your own account.' });
     }
@@ -168,7 +161,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     return res.json({ success: true });
 
   } catch (err) {
-    console.error('[DELETE /employees/:id]', err);
+    console.error('[DELETE /api/employees/:id]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });
