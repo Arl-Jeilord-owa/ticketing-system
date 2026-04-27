@@ -6,7 +6,7 @@ async function seedAdmin() {
   const name = 'Admin User';
   const email = 'admin@omtpi.com.ph';
   const plainPassword = 'Admin@1234';
-  const role = 'admin';
+  const role = 'Admin';
   const dept = 'IT';
 
   const hashedPassword = await bcrypt.hash(plainPassword, 10);

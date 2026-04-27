@@ -227,6 +227,30 @@ router.post('/send', requireAdmin, async (req, res) => {
   }
 });
 
+router.get('/mailbox-counts', requireEmployee, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT
+        COUNT(*) AS total,
+        SUM(CASE WHEN is_read = 0 AND is_archived = 0 THEN 1 ELSE 0 END) AS unread,
+        SUM(CASE WHEN is_archived = 1 THEN 1 ELSE 0 END) AS archived
+      FROM mail_recipients
+      WHERE
+        status = 'sent'
+        AND (
+          recipient_employee_id = ?
+          OR forwarded_to_employee_id = ?
+        )`,
+      [req.session.user.id, req.session.user.id]
+    );
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get counts' });
+  }
+});
+
 // ── ADMIN: SET FORWARDING ────────────────────────
 
 router.get('/forwarding', requireAdmin, async (req, res) => {
@@ -533,6 +557,33 @@ router.get('/mailbox', requireEmployee, async (req, res) => {
   } catch (err) {
     console.error('[GET /api/mail/mailbox]', err);
     return res.status(500).json({ error: 'Failed to load mailbox.' });
+  }
+});
+
+router.get('/mailbox-counts', requireEmployee, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT
+         SUM(CASE WHEN is_archived = 0 THEN 1 ELSE 0 END) AS inbox_count,
+         SUM(CASE WHEN is_archived = 1 THEN 1 ELSE 0 END) AS archived_count,
+         SUM(CASE WHEN is_archived = 0 AND is_read = 0 THEN 1 ELSE 0 END) AS unread_count
+       FROM mail_recipients
+       WHERE status = 'sent'
+         AND (
+           recipient_employee_id = ?
+           OR forwarded_to_employee_id = ?
+         )`,
+      [req.session.user.id, req.session.user.id]
+    );
+
+    return res.json(rows[0] || {
+      inbox_count: 0,
+      archived_count: 0,
+      unread_count: 0
+    });
+  } catch (err) {
+    console.error('[GET /api/mail/mailbox-counts]', err);
+    return res.status(500).json({ error: 'Failed to load mailbox counts.' });
   }
 });
 

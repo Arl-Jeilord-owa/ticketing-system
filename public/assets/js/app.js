@@ -249,7 +249,7 @@ async function renderDashboard(area) {
     <div class="stat-grid">
       <div class="stat-card">
         <div class="stat-label">Employee Role</div>
-        <div class="stat-value blue">${esc(user?.empRole || 'employee')}</div>
+        <div class="stat-value blue">${esc(user?.empRole || 'Employee')}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Department</div>
@@ -473,9 +473,9 @@ function openAddEmployeeModal() {
             <div class="mfield">
               <label>Role</label>
               <select id="new-emp-role">
-                <option value="agent">Agent</option>
-                <option value="admin">Admin</option>
-                <option value="viewer">Viewer</option>
+                <option value="Agent">Agent</option>
+                <option value="Admin">Admin</option>
+                <option value="Viewer">Viewer</option>
               </select>
             </div>
             <div class="mfield span-2">
@@ -674,6 +674,28 @@ function openLegacyMailUsersModal(employees) {
 // ══════════════════════════════════════════════════
 //  MAIL VIEW
 // ══════════════════════════════════════════════════
+
+
+async function loadMailCounts() {
+  try {
+    const res = await fetch('/api/mail/mailbox-counts', {
+      credentials: 'include'
+    });
+    const data = await res.json();
+
+    if (res.ok && data) {
+      const unread = data.unread || 0;
+
+      const nav = document.getElementById('nav-mail');
+      if (nav) {
+        nav.innerHTML = `
+          <span>Mail</span>
+          ${unread > 0 ? `<span class="badge badge-blue">${unread}</span>` : ''}
+        `;
+      }
+    }
+  } catch {}
+}
 async function renderMailView(area) {
   const user = Auth.getCurrentUser();
   const isAdmin = user?.empRole === 'admin';
@@ -1222,9 +1244,9 @@ window.openEditEmployeeModal = function(id, name, role, dept, active) {
             <div class="mfield">
               <label>Role</label>
               <select id="edit-emp-role">
-                <option value="agent" ${role === 'agent' ? 'selected' : ''}>Agent</option>
-                <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
-                <option value="viewer" ${role === 'viewer' ? 'selected' : ''}>Viewer</option>
+                <option value="Agent" ${role === 'Agent' ? 'selected' : ''}>Agent</option>
+                <option value="Admin" ${role === 'Admin' ? 'selected' : ''}>Admin</option>
+                <option value="Viewer" ${role === 'Viewer' ? 'selected' : ''}>Viewer</option>
               </select>
             </div>
             <div class="mfield">

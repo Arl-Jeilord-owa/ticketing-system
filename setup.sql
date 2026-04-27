@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS mail_messages (
   target_label VARCHAR(255),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE IF NOT EXISTS mail_recipients (
   id INT AUTO_INCREMENT PRIMARY KEY,
   mail_message_id INT NOT NULL,
