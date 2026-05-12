@@ -3,17 +3,32 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HelpDesk — OMTPI Support</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>OMTPI HelpDesk</title>
 
+  <!-- ── PWA ─────────────────────────────────────────────── -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0000FF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#4C63FF" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HelpDesk" />
+  <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
+
+  <!-- ── SEO / sharing ───────────────────────────────────── -->
+  <meta name="description" content="OMTPI Operations and Maintenance Support Portal" />
+  <meta name="application-name" content="OMTPI HelpDesk" />
+
+  <!-- ── Theme (load first to avoid flash) ──────────────── -->
   <script src="/assets/js/theme.js"></script>
 
+  <!-- ── Fonts ───────────────────────────────────────────── -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+  <!-- ── CSS ─────────────────────────────────────────────── -->
   <link rel="stylesheet" href="/assets/css/reset.css" />
   <link rel="stylesheet" href="/assets/css/variables.css" />
   <link rel="stylesheet" href="/assets/css/theme.css" />
@@ -27,6 +42,8 @@
   <link rel="stylesheet" href="/assets/css/modal.css" />
   <link rel="stylesheet" href="/assets/css/badges.css" />
   <link rel="stylesheet" href="/assets/css/components.css" />
+  <!-- Mobile & PWA styles — load last so they override desktop styles -->
+  <link rel="stylesheet" href="/assets/css/mobile.css" />
 
   <style>
     /* ── Employees view ── */
@@ -38,7 +55,6 @@
       gap: 12px;
       flex-wrap: wrap;
     }
-
     .emp-search {
       width: 240px;
       padding: 7px 12px;
@@ -49,12 +65,10 @@
       color: var(--text-primary);
       outline: none;
     }
-
     .emp-search:focus {
       border-color: var(--color-blue-400);
-      box-shadow: 0 0 0 3px rgba(55, 138, 221, .12);
+      box-shadow: 0 0 0 3px rgba(55,138,221,.12);
     }
-
     .emp-table {
       width: 100%;
       border-collapse: collapse;
@@ -63,7 +77,6 @@
       border: 0.5px solid var(--border-default);
       overflow: hidden;
     }
-
     .emp-table th {
       text-align: left;
       font-size: 11px;
@@ -75,7 +88,6 @@
       text-transform: uppercase;
       letter-spacing: .03em;
     }
-
     .emp-table td {
       padding: 10px 14px;
       font-size: 13px;
@@ -83,19 +95,9 @@
       color: var(--text-primary);
       vertical-align: middle;
     }
-
-    .emp-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .emp-table tbody tr {
-      transition: background var(--transition-fast);
-    }
-
-    .emp-table tbody tr:hover td {
-      background: var(--bg-secondary);
-    }
-
+    .emp-table tr:last-child td { border-bottom: none; }
+    .emp-table tbody tr { transition: background var(--transition-fast); }
+    .emp-table tbody tr:hover td { background: var(--bg-secondary); }
     .emp-role-pill {
       display: inline-flex;
       align-items: center;
@@ -104,38 +106,12 @@
       font-size: 11px;
       font-weight: 500;
     }
-
-    .emp-role-admin {
-      background: var(--color-blue-50);
-      color: var(--color-blue-800);
-    }
-
-    .emp-role-agent {
-      background: var(--color-purple-50);
-      color: var(--color-purple-800);
-    }
-
-    .emp-role-viewer {
-      background: var(--color-gray-50);
-      color: var(--color-gray-800);
-    }
-
-    .emp-status-active {
-      color: var(--color-green-600);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .emp-status-inactive {
-      color: var(--color-red-400);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .emp-actions {
-      display: flex;
-      gap: 6px;
-    }
+    .emp-role-admin  { background: var(--color-blue-50);   color: var(--color-blue-800); }
+    .emp-role-agent  { background: var(--color-purple-50); color: var(--color-purple-800); }
+    .emp-role-viewer { background: var(--color-gray-50);   color: var(--color-gray-800); }
+    .emp-status-active   { color: var(--color-green-600); font-size: 12px; font-weight: 500; }
+    .emp-status-inactive { color: var(--color-red-400);   font-size: 12px; font-weight: 500; }
+    .emp-actions { display: flex; gap: 6px; }
 
     /* ── Modal form ── */
     .modal-form-grid {
@@ -144,25 +120,10 @@
       gap: 14px;
       margin-bottom: 4px;
     }
-
-    .modal-form-grid .span-2 {
-      grid-column: 1 / -1;
-    }
-
-    .mfield {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .mfield label {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .mfield input,
-    .mfield select {
+    .modal-form-grid .span-2 { grid-column: 1 / -1; }
+    .mfield { display: flex; flex-direction: column; gap: 5px; }
+    .mfield label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+    .mfield input, .mfield select {
       padding: 9px 11px;
       border: 0.5px solid var(--border-medium);
       border-radius: var(--radius-md);
@@ -172,63 +133,46 @@
       outline: none;
       transition: border-color .15s, box-shadow .15s;
     }
-
-    .mfield input:focus,
-    .mfield select:focus {
+    .mfield input:focus, .mfield select:focus {
       border-color: var(--color-blue-400);
-      box-shadow: 0 0 0 3px rgba(55, 138, 221, .12);
+      box-shadow: 0 0 0 3px rgba(55,138,221,.12);
     }
-
     .modal-error {
       background: var(--color-red-50);
       color: var(--color-red-600);
-      border: 0.5px solid rgba(226, 75, 74, .2);
+      border: 0.5px solid rgba(226,75,74,.2);
       border-radius: var(--radius-md);
       padding: 9px 13px;
       font-size: 13px;
       margin-top: 12px;
       display: none;
     }
+    /* ── Admin-only hidden by default ── */
+    .admin-only { display: none; }
 
-    /* ── Toast ── */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9999;
-      background: var(--text-primary);
-      color: var(--bg-primary);
-      padding: 10px 18px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      box-shadow: var(--shadow-md);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .2s, transform .2s;
-      pointer-events: none;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── Admin-only elements hidden by default ── */
-    .admin-only {
-      display: none;
+    /* ── Mobile modal form fix ── */
+    @media (max-width: 640px) {
+      .modal-form-grid { grid-template-columns: 1fr; }
+      .emp-search { width: 100%; }
+      .emp-toolbar { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ═══════════════════ AUTH GATE ═══════════════════ -->
+  <!-- ═══ OFFLINE BANNER ══════════════════════════════════ -->
+  <div id="offline-banner">
+    ⚠️ You're offline — some features may be unavailable
+  </div>
+
+  <!-- ═══ AUTH GATE ════════════════════════════════════════ -->
   <div id="auth-gate">
     <div id="screen-employee-login" class="auth-screen active">
       <div class="auth-card">
         <div class="auth-logo">
           <div class="auth-logo-mark">
-            <img src="/assets/images/LOGO_omtpi.png" class="auth-logo-mark-img" alt="OMTPI Logo">
+            <img src="/assets/images/logo.png" class="auth-logo-mark-img" alt="OMTPI Logo">
           </div>
           <div>
             <div class="auth-logo-name">OMTPI HelpDesk</div>
@@ -237,29 +181,30 @@
         </div>
 
         <div class="auth-step-label">Employee verification</div>
-        <h1 class="auth-heading">Sign in with your company email</h1>
+        <h1 class="auth-heading">Sign in to your account</h1>
         <p class="auth-subheading">Use your <strong>@omtpi.com.ph</strong> employee account.</p>
 
         <div class="field-stack">
           <div class="field-group">
             <label class="field-label" for="emp-email">Company email</label>
-            <input type="email" id="emp-email" class="auth-input" placeholder="you@omtpi.com.ph" autocomplete="email" />
+            <input type="email" id="emp-email" class="auth-input"
+              placeholder="you@omtpi.com.ph"
+              autocomplete="email"
+              inputmode="email" />
           </div>
           <div class="field-group">
             <label class="field-label" for="emp-password">Password</label>
             <div class="password-wrap">
-              <input type="password" id="emp-password" class="auth-input" placeholder="••••••••"
+              <input type="password" id="emp-password" class="auth-input"
+                placeholder="••••••••"
                 autocomplete="current-password" />
               <button class="btn-toggle-pw" id="toggle-pw" type="button" aria-label="Toggle visibility">
-                <svg id="pw-eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                  width="16" height="16">
+                <svg id="pw-eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
-                <svg id="pw-eye-hide" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="1.8" width="16" height="16">
-                  <path
-                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                <svg id="pw-eye-hide" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                   <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               </button>
@@ -273,15 +218,18 @@
     </div>
   </div>
 
-  <!-- ═══════════════════ MAIN APP ═══════════════════ -->
+  <!-- ═══ MAIN APP ══════════════════════════════════════════ -->
   <div id="app-shell" class="hidden">
     <div class="app" id="app">
 
-      <!-- SIDEBAR -->
+      <!-- Sidebar overlay (tablet backdrop) -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+      <!-- ── SIDEBAR ── -->
       <aside class="sidebar" id="sidebar">
         <div class="logo">
           <div class="logo-mark">
-            <img src="/assets/images/LOGO_omtpi.png" class="logo-mark-img" alt="OMTPI Logo">
+            <img src="/assets/images/logo.png" class="logo-mark-img" alt="OMTPI Logo">
           </div>
           <div>
             <div class="logo-text">OMTPI HelpDesk</div>
@@ -317,7 +265,6 @@
           <span class="nav-dot dot-green"></span>
           Resolved
         </div>
-
         <div class="nav-item" data-view="mail" id="nav-mail">
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="2" y="3" width="12" height="10" rx="1.5"></rect>
@@ -325,10 +272,8 @@
           </svg>
           Mail
         </div>
-
         <div class="nav-item" id="new-ticket-nav">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M8 1v14M1 8h14" />
           </svg>
           New ticket
@@ -336,7 +281,6 @@
 
         <!-- Admin only -->
         <div class="nav-section admin-only" id="nav-section-admin">Admin</div>
-
         <div class="nav-item admin-only" data-view="employees" id="nav-employees">
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="6" cy="5" r="3"></circle>
@@ -352,30 +296,73 @@
         </div>
       </aside>
 
-      <!-- MAIN -->
+      <!-- ── MAIN ── -->
       <div class="main">
+
+        <!-- Desktop topbar -->
         <header class="topbar">
           <h1 class="topbar-title" id="view-title">Dashboard</h1>
           <input class="search" type="text" id="search-input" placeholder="Search tickets…" autocomplete="off" />
           <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
-            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16"
-              height="16">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
               <circle cx="12" cy="12" r="4" />
-              <path
-                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
             </svg>
-            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16"
-              height="16">
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
               <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
             </svg>
           </button>
           <button class="btn btn-primary" id="new-ticket-btn">+ New ticket</button>
         </header>
 
+        <!-- Mobile topbar -->
+        <header class="mobile-topbar" id="mobile-topbar">
+          <div class="mobile-topbar-left">
+            <button class="btn-sidebar-toggle" id="btn-sidebar-toggle" aria-label="Open menu">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <path d="M3 5h14M3 10h14M3 15h14" />
+              </svg>
+            </button>
+            <img src="/assets/images/logo.png" class="mobile-topbar-logo" alt="" />
+            <span class="mobile-topbar-title" id="mobile-view-title">Dashboard</span>
+          </div>
+          <div class="mobile-topbar-right">
+            <!-- Search -->
+            <button class="btn-sidebar-toggle" id="btn-mobile-search" aria-label="Search" style="display:flex">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <circle cx="8.5" cy="8.5" r="5.5" />
+                <path d="M15 15l-3-3" />
+              </svg>
+            </button>
+            <!-- Theme toggle -->
+            <button class="theme-toggle" id="theme-toggle-mobile" type="button" aria-label="Toggle theme">
+              <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Mobile search overlay -->
+        <div class="mobile-search-overlay" id="mobile-search-overlay">
+          <div class="mobile-search-bar">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18" style="color:var(--text-tertiary);flex-shrink:0">
+              <circle cx="8.5" cy="8.5" r="5.5" />
+              <path d="M15 15l-3-3" />
+            </svg>
+            <input type="search" id="mobile-search-input" placeholder="Search tickets…" autocomplete="off" />
+          </div>
+          <button class="btn" id="btn-search-close" style="align-self:flex-start">Cancel</button>
+        </div>
+
         <div class="content" id="content-area"></div>
       </div>
 
-      <!-- DETAIL PANEL -->
+      <!-- ── DETAIL PANEL ── -->
       <aside class="panel" id="detail-panel">
         <div class="panel-header">
           <div class="panel-title" id="panel-title">Ticket details</div>
@@ -386,60 +373,119 @@
       </aside>
     </div>
 
+    <!-- ── BOTTOM NAV (mobile only) ── -->
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Main navigation">
+      <div class="mobile-nav-inner">
+
+        <button class="mobile-nav-item active" data-view="dashboard" aria-label="Dashboard">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="11" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="11" width="7" height="7" rx="1.5"/>
+            <rect x="11" y="11" width="7" height="7" rx="1.5"/>
+          </svg>
+          Home
+        </button>
+
+        <button class="mobile-nav-item" data-view="all" aria-label="All tickets">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M4 6h12M4 10h12M4 14h8"/>
+          </svg>
+          Tickets
+          <span class="mobile-nav-badge" id="mobile-badge-all" style="display:none">0</span>
+        </button>
+
+        <button class="mobile-nav-item" id="btn-mobile-new-ticket" aria-label="New ticket"
+          style="position:relative">
+          <span style="
+            width:36px;height:36px;background:var(--color-blue-400);border-radius:50%;
+            display:flex;align-items:center;justify-content:center;margin-bottom:2px;
+            box-shadow:0 2px 8px rgba(0,0,255,.35);
+          ">
+            <svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" width="18" height="18">
+              <path d="M10 4v12M4 10h12"/>
+            </svg>
+          </span>
+          New
+        </button>
+
+        <button class="mobile-nav-item" data-view="mail" aria-label="Mail">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2" y="4" width="16" height="13" rx="1.5"/>
+            <path d="M2 7l8 5 8-5"/>
+          </svg>
+          Mail
+        </button>
+
+        <button class="mobile-nav-item" data-view="employees" aria-label="Employees">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="7" cy="6" r="3.5"/>
+            <path d="M1 18c0-3.5 2.5-6 6-6s6 2.5 6 6"/>
+            <path d="M15 9v6M12 12h6"/>
+          </svg>
+          People
+        </button>
+
+      </div>
+    </nav>
+
+    <!-- Modal container -->
     <div id="modal-container"></div>
   </div>
 
-  <!-- ═══════════════════ TOAST ═══════════════════ -->
+  <!-- ─── PWA INSTALL BANNER ─────────────────────────────── -->
+  <div id="pwa-install-banner">
+    <img src="/assets/images/logo.png" class="pwa-banner-icon" alt="" />
+    <div class="pwa-banner-text">
+      <div class="pwa-banner-title">Install HelpDesk</div>
+      <div class="pwa-banner-sub">Add to your home screen for quick access</div>
+    </div>
+    <div class="pwa-banner-actions">
+      <button class="btn btn-sm" id="btn-pwa-dismiss">Later</button>
+      <button class="btn btn-primary btn-sm" id="btn-pwa-install">Install</button>
+    </div>
+  </div>
+
+  <!-- ── Toast ── -->
   <div id="toast"></div>
 
-  <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+  <!-- ══════════ SCRIPTS ════════════════════════════════════ -->
   <script src="/assets/js/utils.js"></script>
   <script src="/assets/js/data.js"></script>
   <script src="/assets/js/render.js"></script>
   <script src="/assets/js/panel.js"></script>
   <script src="/assets/js/modal.js"></script>
   <script src="/assets/js/app.js"></script>
+  <!-- PWA + mobile nav — load last -->
+  <script src="/assets/js/pwa.js"></script>
 
   <script>
-    // ══════════════════════════════════════════════════
-    //  AUTH
-    // ══════════════════════════════════════════════════
+    // ── Auth wiring (inline — keeps app.js untouched) ───────
     const authGate = document.getElementById('auth-gate');
     const appShell = document.getElementById('app-shell');
     const empError = document.getElementById('emp-error');
 
     let currentUser = null;
 
-    function showError(el, msg) {
-      el.textContent = msg;
-      el.classList.remove('hidden');
-    }
-    function hideError(el) {
-      el.textContent = '';
-      el.classList.add('hidden');
-    }
+    function showError(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+    function hideError(el)      { el.textContent = '';  el.classList.add('hidden'); }
 
     // Password toggle
     document.getElementById('toggle-pw').addEventListener('click', () => {
       const input = document.getElementById('emp-password');
-      const show = document.getElementById('pw-eye-show');
-      const hide = document.getElementById('pw-eye-hide');
-      if (input.type === 'password') {
-        input.type = 'text';
-        show.classList.add('hidden');
-        hide.classList.remove('hidden');
-      } else {
-        input.type = 'password';
-        show.classList.remove('hidden');
-        hide.classList.add('hidden');
-      }
+      const show  = document.getElementById('pw-eye-show');
+      const hide  = document.getElementById('pw-eye-hide');
+      const isPw  = input.type === 'password';
+      input.type  = isPw ? 'text' : 'password';
+      show.classList.toggle('hidden',  isPw);
+      hide.classList.toggle('hidden', !isPw);
     });
 
     // Login
-    document.getElementById('btn-employee-login').addEventListener('click', async () => {
-      const email = document.getElementById('emp-email').value.trim();
+    async function doLogin() {
+      const email    = document.getElementById('emp-email').value.trim();
       const password = document.getElementById('emp-password').value;
-      const btn = document.getElementById('btn-employee-login');
+      const btn      = document.getElementById('btn-employee-login');
 
       hideError(empError);
 
@@ -448,11 +494,11 @@
         return;
       }
 
-      btn.disabled = true;
+      btn.disabled    = true;
       btn.textContent = 'Signing in…';
 
       try {
-        const res = await fetch('/api/auth/employee-login', {
+        const res  = await fetch('/api/auth/employee-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -467,60 +513,50 @@
         currentUser = data.user;
         bootApp();
 
-      } catch (err) {
+      } catch {
         showError(empError, 'Network error. Please try again.');
       } finally {
-        btn.disabled = false;
+        btn.disabled    = false;
         btn.textContent = 'Sign in';
       }
-    });
+    }
 
-    // Enter key on password field
+    document.getElementById('btn-employee-login').addEventListener('click', doLogin);
     document.getElementById('emp-password').addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('btn-employee-login').click();
+      if (e.key === 'Enter') doLogin();
     });
 
     // Sign out
     document.getElementById('btn-signout').addEventListener('click', async () => {
-      await fetch('/api/auth/signout', { method: 'POST' });
-      currentUser = null;
-      appShell.classList.add('hidden');
-      authGate.classList.remove('hidden');
-      document.getElementById('emp-email').value = '';
-      document.getElementById('emp-password').value = '';
+      await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
+      location.reload();
     });
 
-    // Check existing session on page load
+    // Session check on load
     async function checkSession() {
       try {
         const res = await fetch('/api/auth/me');
-        if (res.ok) {
-          const data = await res.json();
-          currentUser = data.user;
-          bootApp();
-        }
-      } catch (_) { }
+        if (res.ok) { currentUser = (await res.json()).user; bootApp(); }
+      } catch {}
     }
 
-    // ══════════════════════════════════════════════════
-    //  BOOT APP
-    // ══════════════════════════════════════════════════
+    // Boot app
     function bootApp() {
       authGate.classList.add('hidden');
       appShell.classList.remove('hidden');
 
-      // Session info in sidebar
       document.getElementById('session-info').textContent =
         `${currentUser.name} · ${currentUser.empRole}`;
 
-      // Show admin-only elements
       if (currentUser.empRole === 'admin') {
-        document.querySelectorAll('.admin-only').forEach(el => {
-          el.style.display = '';
-        });
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+      } else {
+        // Hide employees tab in mobile nav for non-admins
+        const empNav = document.querySelector('.mobile-nav-item[data-view="employees"]');
+        if (empNav) empNav.style.display = 'none';
       }
 
-      // Nav click handling
+      // Desktop nav
       document.querySelectorAll('.nav-item[data-view]').forEach(item => {
         item.addEventListener('click', () => {
           document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -531,404 +567,45 @@
         });
       });
 
+      // New ticket buttons
+      document.getElementById('new-ticket-btn')?.addEventListener('click', () => Modal.open());
+      document.getElementById('new-ticket-nav')?.addEventListener('click', () => Modal.open());
+
+      // Mobile theme toggle mirror
+      document.getElementById('theme-toggle-mobile')?.addEventListener('click', () => {
+        document.getElementById('theme-toggle')?.click();
+      });
+
       renderView('dashboard');
     }
 
     const viewTitles = {
       dashboard: 'Dashboard',
-      all: 'All Tickets',
-      internal: 'Internal Tickets',
-      resolved: 'Resolved',
+      all:       'All Tickets',
+      internal:  'Internal Tickets',
+      resolved:  'Resolved',
       employees: 'Employees',
+      mail:      'Mail',
     };
 
     function renderView(view) {
       const area = document.getElementById('content-area');
-      if (view === 'employees') {
-        renderEmployeesView(area);
-      } else {
-        // Hand off to existing app.js for ticket views
-        if (typeof window.loadView === 'function') window.loadView(view);
-      }
+      if (!area) return;
+
+      // Update mobile title
+      const mobileTitle = document.getElementById('mobile-view-title');
+      if (mobileTitle) mobileTitle.textContent = viewTitles[view] || view;
+
+      if (view === 'dashboard') { renderDashboard(area); return; }
+      if (view === 'employees') { renderEmployeesView(area); return; }
+      if (view === 'mail')      { renderMailView(area); return; }
+
+      area.innerHTML = `<div style="color:var(--text-tertiary);font-size:14px;padding:20px">
+        View "<strong>${esc(view)}</strong>" is coming soon.</div>`;
     }
 
-    // ══════════════════════════════════════════════════
-    //  EMPLOYEES VIEW
-    // ══════════════════════════════════════════════════
-    async function renderEmployeesView(area) {
-      area.innerHTML = `<div style="color:var(--text-tertiary);font-size:13px">Loading employees…</div>`;
-
-      let employees = [];
-      try {
-        const res = await fetch('/api/employees');
-        const data = await res.json();
-        employees = data.employees || [];
-      } catch (err) {
-        area.innerHTML = `<div style="color:var(--color-red-400);font-size:13px">Failed to load employees.</div>`;
-        return;
-      }
-
-      const isAdmin = currentUser.empRole === 'admin';
-
-      area.innerHTML = `
-    <div class="emp-toolbar">
-      <input class="emp-search" id="emp-search" placeholder="Search employees…" />
-      ${isAdmin ? `<button class="btn btn-primary" id="btn-add-emp">+ Add employee</button>` : ''}
-    </div>
-    <table class="emp-table" id="emp-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Department</th>
-          <th>Status</th>
-          <th>Joined</th>
-          ${isAdmin ? '<th></th>' : ''}
-        </tr>
-      </thead>
-      <tbody id="emp-tbody"></tbody>
-    </table>
-  `;
-
-      renderEmpRows(employees, isAdmin);
-
-      // Search filter
-      document.getElementById('emp-search').addEventListener('input', e => {
-        const q = e.target.value.toLowerCase();
-        const filtered = employees.filter(emp =>
-          emp.name.toLowerCase().includes(q) ||
-          emp.email.toLowerCase().includes(q) ||
-          (emp.dept || '').toLowerCase().includes(q)
-        );
-        renderEmpRows(filtered, isAdmin);
-      });
-
-      // Add employee button
-      if (isAdmin) {
-        document.getElementById('btn-add-emp').addEventListener('click', () => {
-          openAddEmployeeModal(employees);
-        });
-      }
-    }
-
-    function renderEmpRows(employees, isAdmin) {
-      const tbody = document.getElementById('emp-tbody');
-      if (!employees.length) {
-        tbody.innerHTML = `<tr><td colspan="${isAdmin ? 7 : 6}" style="text-align:center;padding:32px;color:var(--text-tertiary);font-size:13px">No employees found.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = employees.map(emp => {
-        const joined = new Date(emp.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
-        return `
-      <tr>
-        <td><strong style="font-weight:500">${esc(emp.name)}</strong></td>
-        <td style="color:var(--text-secondary)">${esc(emp.email)}</td>
-        <td><span class="emp-role-pill emp-role-${emp.role}">${emp.role}</span></td>
-        <td style="color:var(--text-secondary)">${emp.dept ? esc(emp.dept) : '<span style="color:var(--text-tertiary)">—</span>'}</td>
-        <td><span class="${emp.active ? 'emp-status-active' : 'emp-status-inactive'}">${emp.active ? '● Active' : '● Inactive'}</span></td>
-        <td style="color:var(--text-tertiary);font-size:12px">${joined}</td>
-        ${isAdmin ? `
-        <td>
-          <div class="emp-actions">
-            <button class="btn btn-sm" onclick="openEditEmployeeModal(${emp.id}, '${esc(emp.name)}', '${emp.role}', '${emp.dept || ''}', ${emp.active})">Edit</button>
-            <button class="btn btn-sm" onclick="openResetPasswordModal(${emp.id}, '${esc(emp.name)}')">Reset PW</button>
-          </div>
-        </td>` : ''}
-      </tr>
-    `;
-      }).join('');
-    }
-
-    function esc(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // ── Add Employee Modal ────────────────────────────
-    function openAddEmployeeModal() {
-      const container = document.getElementById('modal-container');
-      container.innerHTML = `
-    <div class="modal-overlay" id="emp-modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-header-title">Add Employee</div>
-          <button class="btn btn-sm" id="close-emp-modal">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="modal-form-grid">
-            <div class="mfield span-2">
-              <label>Full Name</label>
-              <input type="text" id="new-emp-name" placeholder="Juan dela Cruz" />
-            </div>
-            <div class="mfield span-2">
-              <label>Email</label>
-              <input type="email" id="new-emp-email" placeholder="juan@omtpi.com.ph" />
-            </div>
-            <div class="mfield">
-              <label>Password</label>
-              <input type="password" id="new-emp-password" placeholder="Min. 8 characters" />
-            </div>
-            <div class="mfield">
-              <label>Role</label>
-              <select id="new-emp-role">
-                <option value="Agent">Agent</option>
-                <option value="Admin">Admin</option>
-                <option value="Viewer">Viewer</option>
-              </select>
-            </div>
-            <div class="mfield span-2">
-              <label>Department</label>
-              <input type="text" id="new-emp-dept" placeholder="e.g. IT, Operations" />
-            </div>
-          </div>
-          <div class="modal-error" id="emp-modal-error"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn" id="cancel-emp-modal">Cancel</button>
-          <button class="btn btn-primary" id="save-emp-btn">Create Employee</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-      document.getElementById('close-emp-modal').onclick =
-        document.getElementById('cancel-emp-modal').onclick = () => container.innerHTML = '';
-      document.getElementById('emp-modal-overlay').onclick = e => { if (e.target.id === 'emp-modal-overlay') container.innerHTML = ''; };
-
-      document.getElementById('save-emp-btn').addEventListener('click', async () => {
-        const name = document.getElementById('new-emp-name').value.trim();
-        const email = document.getElementById('new-emp-email').value.trim();
-        const password = document.getElementById('new-emp-password').value;
-        const role = document.getElementById('new-emp-role').value;
-        const dept = document.getElementById('new-emp-dept').value.trim();
-        const errEl = document.getElementById('emp-modal-error');
-        errEl.style.display = 'none';
-
-        if (!name || !email || !password) {
-          errEl.textContent = 'Name, email, and password are required.';
-          errEl.style.display = 'block';
-          return;
-        }
-
-        const btn = document.getElementById('save-emp-btn');
-        btn.disabled = true;
-        btn.textContent = 'Creating…';
-
-        try {
-          const res = await fetch('/api/employees', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role, dept }),
-          });
-          const data = await res.json();
-
-          if (!res.ok) {
-            errEl.textContent = data.error || 'Failed to create employee.';
-            errEl.style.display = 'block';
-            return;
-          }
-
-          container.innerHTML = '';
-          showToast(`✓ ${email} created successfully`);
-          // Refresh the employees view
-          renderEmployeesView(document.getElementById('content-area'));
-
-        } catch (_) {
-          errEl.textContent = 'Network error. Try again.';
-          errEl.style.display = 'block';
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Create Employee';
-        }
-      });
-    }
-
-    // ── Edit Employee Modal ───────────────────────────
-    window.openEditEmployeeModal = function (id, name, role, dept, active) {
-      const container = document.getElementById('modal-container');
-      container.innerHTML = `
-    <div class="modal-overlay" id="edit-modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-header-title">Edit Employee</div>
-          <button class="btn btn-sm" id="close-edit-modal">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="modal-form-grid">
-            <div class="mfield span-2">
-              <label>Full Name</label>
-              <input type="text" id="edit-emp-name" value="${esc(name)}" />
-            </div>
-            <div class="mfield">
-              <label>Role</label>
-              <select id="edit-emp-role">
-                <option value="Agent"  ${role === 'Agent' ? 'selected' : ''}>Agent</option>
-                <option value="Admin"  ${role === 'Admin' ? 'selected' : ''}>Admin</option>
-                <option value="Viewer" ${role === 'Viewer' ? 'selected' : ''}>Viewer</option>
-              </select>
-            </div>
-            <div class="mfield">
-              <label>Status</label>
-              <select id="edit-emp-active">
-                <option value="1" ${active ? 'selected' : ''}>Active</option>
-                <option value="0" ${!active ? 'selected' : ''}>Inactive</option>
-              </select>
-            </div>
-            <div class="mfield span-2">
-              <label>Department</label>
-              <input type="text" id="edit-emp-dept" value="${esc(dept)}" />
-            </div>
-          </div>
-          <div class="modal-error" id="edit-modal-error"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-danger" id="delete-emp-btn">Delete</button>
-          <button class="btn" id="cancel-edit-modal">Cancel</button>
-          <button class="btn btn-primary" id="save-edit-btn">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-      document.getElementById('close-edit-modal').onclick =
-        document.getElementById('cancel-edit-modal').onclick = () => container.innerHTML = '';
-
-      document.getElementById('save-edit-btn').addEventListener('click', async () => {
-        const errEl = document.getElementById('edit-modal-error');
-        errEl.style.display = 'none';
-        const btn = document.getElementById('save-edit-btn');
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
-
-        try {
-          const res = await fetch(`/api/employees/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: document.getElementById('edit-emp-name').value.trim(),
-              role: document.getElementById('edit-emp-role').value,
-              dept: document.getElementById('edit-emp-dept').value.trim(),
-              active: document.getElementById('edit-emp-active').value === '1',
-            }),
-          });
-          const data = await res.json();
-          if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
-          container.innerHTML = '';
-          showToast('✓ Employee updated');
-          renderEmployeesView(document.getElementById('content-area'));
-        } catch (_) {
-          errEl.textContent = 'Network error.';
-          errEl.style.display = 'block';
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Save Changes';
-        }
-      });
-
-      document.getElementById('delete-emp-btn').addEventListener('click', async () => {
-        if (!confirm(`Delete ${name}? This cannot be undone.`)) return;
-        const res = await fetch(`/api/employees/${id}`, { method: 'DELETE' });
-        const data = await res.json();
-        if (!res.ok) { alert(data.error); return; }
-        container.innerHTML = '';
-        showToast('✓ Employee deleted');
-        renderEmployeesView(document.getElementById('content-area'));
-      });
-    };
-
-    // ── Reset Password Modal ──────────────────────────
-    window.openResetPasswordModal = function (id, name) {
-      const container = document.getElementById('modal-container');
-      container.innerHTML = `
-    <div class="modal-overlay" id="pw-modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-header-title">Reset Password — ${esc(name)}</div>
-          <button class="btn btn-sm" id="close-pw-modal">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="modal-form-grid">
-            <div class="mfield span-2">
-              <label>New Password</label>
-              <input type="password" id="new-pw" placeholder="Min. 8 characters" />
-            </div>
-            <div class="mfield span-2">
-              <label>Confirm Password</label>
-              <input type="password" id="confirm-pw" placeholder="Repeat password" />
-            </div>
-          </div>
-          <div class="modal-error" id="pw-modal-error"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn" id="cancel-pw-modal">Cancel</button>
-          <button class="btn btn-primary" id="save-pw-btn">Reset Password</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-      document.getElementById('close-pw-modal').onclick =
-        document.getElementById('cancel-pw-modal').onclick = () => container.innerHTML = '';
-
-      document.getElementById('save-pw-btn').addEventListener('click', async () => {
-        const pw = document.getElementById('new-pw').value;
-        const confirm = document.getElementById('confirm-pw').value;
-        const errEl = document.getElementById('pw-modal-error');
-        errEl.style.display = 'none';
-
-        if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-        if (pw !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
-
-        const btn = document.getElementById('save-pw-btn');
-        btn.disabled = true; btn.textContent = 'Saving…';
-
-        try {
-          const res = await fetch(`/api/employees/${id}/password`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: pw }),
-          });
-          const data = await res.json();
-          if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
-          container.innerHTML = '';
-          showToast('✓ Password reset successfully');
-        } catch (_) {
-          errEl.textContent = 'Network error.';
-          errEl.style.display = 'block';
-        } finally {
-          btn.disabled = false; btn.textContent = 'Reset Password';
-        }
-      });
-    };
-
-    // ══════════════════════════════════════════════════
-    //  TOAST
-    // ══════════════════════════════════════════════════
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // ══════════════════════════════════════════════════
-    //  THEME TOGGLE
-    // ══════════════════════════════════════════════════
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    });
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-
-    // ══════════════════════════════════════════════════
-    //  INIT
-    // ══════════════════════════════════════════════════
     checkSession();
   </script>
 
 </body>
-
 </html>

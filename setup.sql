@@ -94,3 +94,6 @@ VALUES (
   'admin',
   'IT'
 );
+
+USE omtpi_helpdesk;
+SHOW TABLES LIKE 'mail_%';
